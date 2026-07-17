@@ -1,0 +1,1280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="theme-color" content="#4A6FA5">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="工作计划">
+<link rel="manifest" href="./manifest.json">
+<link rel="icon" href="./icon.svg" type="image/svg+xml">
+<link rel="apple-touch-icon" href="./icon.svg">
+<title>工作计划安排表</title>
+<style>
+:root {
+  --c-blue-50: #F0F4F8; --c-blue-100: #E1E8F0; --c-blue-200: #C5D3E0;
+  --c-blue-400: #7A9BB5; --c-blue-600: #4A6FA5; --c-blue-700: #3A5A8C;
+  --c-blue-800: #2D4A7C;
+  --c-n-50: #F8F9FA; --c-n-100: #F0F2F4; --c-n-200: #E5E8EB;
+  --c-n-400: #A0AAB4; --c-n-500: #8A95A5; --c-n-600: #6B7A8A;
+  --c-n-700: #4A5A6A; --c-n-800: #2C3E50; --c-n-900: #1A252F;
+  --c-red: #E74C3C; --c-orange: #F39C12; --c-green: #27AE60; --c-green-l: #2ECC71;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", "Helvetica Neue", sans-serif;
+  --shadow-sm: 0 1px 3px rgba(0,0,0,0.06); --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+  --shadow-lg: 0 8px 24px rgba(0,0,0,0.12); --shadow-xl: 0 12px 48px rgba(0,0,0,0.18);
+  --radius-sm: 6px; --radius-md: 10px; --radius-lg: 16px; --radius-full: 999px;
+  --easing: cubic-bezier(0.4, 0, 0.2, 1);
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+  --safe-top: env(safe-area-inset-top, 0px);
+  --header-h: 52px; --nav-h: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html, body { height: 100%; overflow: hidden; }
+body {
+  font-family: var(--font); font-size: 14px; line-height: 1.5; color: var(--c-n-800);
+  background: var(--c-blue-50); -webkit-font-smoothing: antialiased;
+}
+#app {
+  display: flex; flex-direction: column; height: 100vh; height: 100dvh;
+  max-width: 1400px; margin: 0 auto; padding: 0; position: relative;
+  background: #fff;
+}
+
+/* ===== Header ===== */
+#app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 16px; height: var(--header-h); padding-top: var(--safe-top);
+  background: linear-gradient(135deg, #4A6FA5 0%, #3A5A8C 100%);
+  color: #fff; flex-shrink: 0; position: sticky; top: 0; z-index: 10;
+  -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+}
+.header-left { display: flex; align-items: center; gap: 10px; }
+.header-left .logo {
+  width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm);
+  display: flex; align-items: center; justify-content: center; font-size: 16px;
+  backdrop-filter: blur(4px);
+}
+.header-left h1 { font-size: 16px; font-weight: 600; letter-spacing: 0.5px; }
+.header-right { display: flex; align-items: center; gap: 6px; }
+.header-right .btn {
+  background: rgba(255,255,255,0.15); border: 1px solid rgba(255,255,255,0.1);
+  color: #fff; padding: 5px 10px; font-size: 12px;
+}
+.header-right .btn:hover { background: rgba(255,255,255,0.25); }
+.header-right .btn-danger { color: #FFB3B3; }
+.header-right .btn-danger:hover { background: rgba(231,76,60,0.3); color: #FFD6D6; }
+
+/* ===== Nav ===== */
+#app-nav {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 12px; height: var(--nav-h); flex-shrink: 0;
+  background: #fff; border-bottom: 1px solid var(--c-n-100);
+}
+.nav-center { display: flex; align-items: center; gap: 8px; }
+.nav-title { font-size: 15px; font-weight: 600; color: var(--c-n-900); min-width: 120px; text-align: center; }
+.nav-actions { display: flex; align-items: center; gap: 2px; }
+.nav-actions .btn { color: var(--c-n-600); }
+.nav-actions .btn:hover { color: var(--c-blue-600); background: var(--c-blue-50); }
+.view-tabs { display: flex; border: none; border-radius: var(--radius-md); overflow: hidden; background: var(--c-n-100); }
+.view-tab {
+  padding: 5px 14px; font-size: 12px; font-weight: 500; cursor: pointer; border: none; background: transparent;
+  color: var(--c-n-500); transition: all .25s var(--easing); user-select: none; border-radius: var(--radius-sm);
+}
+.view-tab.active { background: #fff; color: var(--c-blue-600); box-shadow: var(--shadow-sm); }
+
+/* ===== Filter ===== */
+#app-filter {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 8px 12px; flex-shrink: 0; gap: 8px; flex-wrap: wrap;
+  background: #fff; border-bottom: 1px solid var(--c-n-100);
+}
+.filter-group { display: flex; align-items: center; gap: 4px; flex-wrap: wrap; }
+.filter-label { font-size: 11px; color: var(--c-n-500); font-weight: 500; white-space: nowrap; }
+.filter-btn {
+  padding: 3px 10px; border: 1px solid var(--c-n-200); border-radius: var(--radius-full);
+  background: #fff; font-size: 11px; cursor: pointer; color: var(--c-n-600);
+  transition: all .2s var(--easing); font-family: var(--font); font-weight: 500;
+}
+.filter-btn:hover { border-color: var(--c-blue-200); color: var(--c-blue-600); }
+.filter-btn.active { background: var(--c-blue-600); color: #fff; border-color: var(--c-blue-600); }
+.filter-btn.p-high.active { background: var(--c-red); border-color: var(--c-red); }
+.filter-btn.p-medium.active { background: var(--c-orange); border-color: var(--c-orange); }
+.filter-btn.p-low.active { background: var(--c-green); border-color: var(--c-green); }
+.stats { display: flex; align-items: center; gap: 10px; font-size: 11px; color: var(--c-n-400); }
+.stat-item { display: flex; align-items: center; gap: 3px; white-space: nowrap; }
+.stat-dot { width: 6px; height: 6px; border-radius: 50%; display: inline-block; }
+
+/* ===== Content ===== */
+#app-content {
+  flex: 1; overflow-y: auto; overflow-x: hidden; padding: 8px; padding-bottom: calc(8px + var(--safe-bottom));
+  background: var(--c-blue-50);
+  -webkit-overflow-scrolling: touch;
+}
+#app-content::-webkit-scrollbar { width: 4px; }
+#app-content::-webkit-scrollbar-track { background: transparent; }
+#app-content::-webkit-scrollbar-thumb { background: var(--c-n-200); border-radius: 2px; }
+
+/* ===== Week View ===== */
+.week-view {
+  display: flex; flex-direction: column; gap: 1px;
+  background: var(--c-n-200); border-radius: var(--radius-lg); overflow: hidden;
+  border: 1px solid var(--c-n-200); background-clip: padding-box;
+}
+.week-header { display: grid; grid-template-columns: 54px repeat(7, 1fr); background: #fff; }
+.week-header .wh-cell {
+  padding: 8px 4px; text-align: center; font-size: 12px; font-weight: 600; color: var(--c-n-700);
+  border-bottom: 2px solid transparent;
+}
+.week-header .wh-cell.today { color: var(--c-blue-600); border-bottom-color: var(--c-blue-600); }
+.week-header .wh-cell .wh-date { font-weight: 400; font-size: 10px; color: var(--c-n-400); display: block; margin-top: 1px; }
+.week-header .wh-cell.today .wh-date { color: var(--c-blue-600); font-weight: 500; }
+.week-body { display: flex; flex-direction: column; }
+.week-row { display: grid; grid-template-columns: 54px repeat(7, 1fr); background: #fff; }
+.week-row + .week-row { border-top: 1px solid var(--c-n-100); }
+.slot-label {
+  padding: 8px 4px; font-size: 11px; color: var(--c-n-500); font-weight: 500;
+  background: var(--c-n-50); display: flex; flex-direction: column; align-items: center; justify-content: center;
+  border-right: 1px solid var(--c-n-200); gap: 1px;
+}
+.slot-label .slot-sub { font-size: 9px; color: var(--c-n-400); font-weight: 400; }
+.slot-cell {
+  min-height: 88px; padding: 4px; position: relative;
+  transition: background .15s var(--easing);
+}
+.slot-cell:hover { background: var(--c-blue-50); }
+.slot-cell.today-col { background: #FAFCFF; }
+.slot-cell.today-col:hover { background: var(--c-blue-50); }
+.slot-cell.drop-target { background: #DBEAFE !important; box-shadow: inset 0 0 0 2px var(--c-blue-400); border-radius: var(--radius-sm); }
+.slot-cell + .slot-cell { border-left: 1px solid var(--c-n-100); }
+.add-btn {
+  position: absolute; bottom: 4px; right: 4px; width: 20px; height: 20px;
+  border: 1px dashed var(--c-n-300); border-radius: 50%; background: transparent;
+  color: var(--c-n-400); cursor: pointer; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; line-height: 1; opacity: 0; transition: all .2s var(--easing);
+}
+.slot-cell:hover .add-btn { opacity: 1; }
+.add-btn:hover { border-color: var(--c-blue-400); color: var(--c-blue-600); background: rgba(255,255,255,0.8); }
+@media (hover: none) { .add-btn { opacity: 1; border-color: var(--c-n-200); } }
+
+/* ===== Task Card ===== */
+.task-card {
+  background: #fff; border: 1px solid var(--c-n-200); border-radius: var(--radius-sm);
+  padding: 5px 6px; margin-bottom: 3px; cursor: grab; position: relative;
+  transition: all .15s var(--easing); user-select: none; font-size: 11px;
+  border-left: 3px solid var(--c-n-400);
+}
+.task-card:hover { box-shadow: var(--shadow-sm); border-color: var(--c-blue-200); }
+.task-card:active { transform: scale(0.98); }
+.task-card.dragging { opacity: 0.4; transform: rotate(2deg) scale(0.95); }
+.task-card.completed { opacity: 0.55; }
+.task-card.completed .task-title { text-decoration: line-through; color: var(--c-n-400); }
+.task-card.p-high { border-left-color: var(--c-red); }
+.task-card.p-medium { border-left-color: var(--c-orange); }
+.task-card.p-low { border-left-color: var(--c-green); }
+.task-card.has-alarm { border-right: 2px solid var(--c-blue-400); }
+.task-header { display: flex; align-items: flex-start; gap: 4px; }
+.task-cb {
+  width: 13px; height: 13px; cursor: pointer; accent-color: var(--c-blue-600);
+  flex-shrink: 0; margin-top: 1px;
+}
+.task-title { flex: 1; word-break: break-word; color: var(--c-n-800); line-height: 1.35; font-weight: 500; }
+.task-footer { display: flex; align-items: center; gap: 3px; margin-top: 3px; flex-wrap: wrap; }
+.task-priority { font-size: 9px; padding: 1px 5px; border-radius: var(--radius-full); font-weight: 600; }
+.task-priority.high { background: #FDEDEC; color: var(--c-red); }
+.task-priority.medium { background: #FEF5E7; color: var(--c-orange); }
+.task-priority.low { background: #E9F7EF; color: var(--c-green); }
+.task-time { font-size: 9px; color: var(--c-n-400); }
+.task-alarm-icon { font-size: 9px; color: var(--c-blue-400); }
+
+/* ===== Empty ===== */
+.empty-state {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  padding: 60px 20px; color: var(--c-n-400); text-align: center;
+}
+.empty-state .empty-icon { font-size: 48px; margin-bottom: 12px; opacity: 0.6; }
+.empty-state .empty-title { font-size: 16px; font-weight: 600; color: var(--c-n-600); margin-bottom: 6px; }
+.empty-state .empty-desc { font-size: 13px; color: var(--c-n-400); max-width: 260px; line-height: 1.6; }
+
+/* ===== Month View ===== */
+.month-view { background: #fff; border-radius: var(--radius-lg); overflow: hidden; border: 1px solid var(--c-n-200); }
+.month-header { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--c-n-50); border-bottom: 1px solid var(--c-n-200); }
+.month-header .mh-cell { padding: 8px 4px; text-align: center; font-size: 11px; font-weight: 600; color: var(--c-n-500); }
+.month-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.month-cell {
+  min-height: 72px; padding: 4px 6px; border-bottom: 1px solid var(--c-n-100);
+  border-right: 1px solid var(--c-n-100); cursor: pointer; transition: background .15s var(--easing);
+}
+.month-cell:nth-child(7n) { border-right: none; }
+.month-cell:hover { background: var(--c-blue-50); }
+.month-cell.other-month { background: var(--c-n-50); }
+.month-cell.other-month .mc-day { color: var(--c-n-400); }
+.month-cell.today { background: #EBF5FF; }
+.month-cell .mc-day { font-size: 12px; font-weight: 500; color: var(--c-n-700); margin-bottom: 3px; }
+.month-cell.today .mc-day {
+  width: 24px; height: 24px; background: var(--c-blue-600); color: #fff; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; font-size: 11px;
+}
+.month-cell .mc-dots { display: flex; flex-wrap: wrap; gap: 2px; }
+.month-cell .mc-dot { width: 5px; height: 5px; border-radius: 50%; }
+.mc-dot.high { background: var(--c-red); }
+.mc-dot.medium { background: var(--c-orange); }
+.mc-dot.low { background: var(--c-green); }
+.mc-dot.done { background: var(--c-n-200); }
+.mc-count { font-size: 10px; color: var(--c-n-400); }
+
+/* ===== Modal (bottom sheet on mobile) ===== */
+.modal-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn .2s var(--easing);
+}
+.modal {
+  background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);
+  width: 460px; max-width: 94vw; max-height: 90vh; overflow-y: auto;
+  animation: scaleIn .25s var(--easing);
+}
+@media (max-width: 520px) {
+  .modal-overlay { align-items: flex-end; }
+  .modal {
+    width: 100%; max-width: 100%; border-radius: var(--radius-lg) var(--radius-lg) 0 0;
+    max-height: 92vh; margin: 0; animation: slideUp .3s var(--easing);
+  }
+}
+.modal-header { display: flex; align-items: center; justify-content: space-between; padding: 16px 20px 0; }
+.modal-header h2 { font-size: 16px; font-weight: 600; color: var(--c-n-900); }
+.modal-close {
+  width: 28px; height: 28px; border: none; background: var(--c-n-100); font-size: 16px;
+  cursor: pointer; color: var(--c-n-600); border-radius: 50%;
+  display: flex; align-items: center; justify-content: center; transition: background .2s;
+}
+.modal-close:hover { background: var(--c-n-200); }
+.modal-body { padding: 16px 20px; }
+.form-group { margin-bottom: 14px; }
+.form-label { display: flex; align-items: center; gap: 4px; font-size: 12px; font-weight: 600; color: var(--c-n-700); margin-bottom: 4px; }
+.form-label .required { color: var(--c-red); }
+.form-hint { font-size: 11px; color: var(--c-n-400); font-weight: 400; margin-left: 6px; }
+.form-input, .form-textarea, .form-select {
+  width: 100%; padding: 9px 12px; border: 1.5px solid var(--c-n-200); border-radius: var(--radius-sm);
+  font-size: 14px; font-family: var(--font); color: var(--c-n-800);
+  transition: border-color .2s var(--easing); background: #fff; -webkit-appearance: none;
+}
+.form-input:focus, .form-textarea:focus, .form-select:focus {
+  outline: none; border-color: var(--c-blue-400); box-shadow: 0 0 0 3px rgba(74,111,165,0.12);
+}
+.form-input.error { border-color: var(--c-red); animation: shake .3s var(--easing); }
+.form-textarea { resize: vertical; min-height: 60px; font-size: 13px; }
+.form-row { display: flex; gap: 10px; }
+.form-row .form-group { flex: 1; }
+.radio-group { display: flex; gap: 8px; flex-wrap: wrap; }
+.radio-label {
+  display: flex; align-items: center; gap: 4px; font-size: 12px; cursor: pointer; padding: 5px 12px;
+  border: 1.5px solid var(--c-n-200); border-radius: var(--radius-full);
+  transition: all .2s var(--easing); font-weight: 500;
+}
+.radio-label:hover { border-color: var(--c-blue-200); }
+.radio-label input { display: none; }
+.radio-label.active.p-high { border-color: var(--c-red); background: #FDEDEC; color: var(--c-red); }
+.radio-label.active.p-medium { border-color: var(--c-orange); background: #FEF5E7; color: var(--c-orange); }
+.radio-label.active.p-low { border-color: var(--c-green); background: #E9F7EF; color: var(--c-green); }
+.reminder-group { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; padding: 8px 0; }
+.reminder-group .toggle-wrap { display: flex; align-items: center; gap: 8px; cursor: pointer; }
+.toggle-track {
+  width: 38px; height: 22px; background: var(--c-n-200); border-radius: 11px; position: relative;
+  transition: background .25s var(--easing); flex-shrink: 0;
+}
+.toggle-track.on { background: var(--c-blue-600); }
+.toggle-knob {
+  width: 18px; height: 18px; background: #fff; border-radius: 50%; position: absolute;
+  top: 2px; left: 2px; transition: transform .25s var(--easing); box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+.toggle-track.on .toggle-knob { transform: translateX(16px); }
+.toggle-label { font-size: 12px; color: var(--c-n-600); font-weight: 500; }
+.form-select-sm { padding: 5px 10px; font-size: 12px; border-radius: var(--radius-sm); border: 1.5px solid var(--c-n-200); }
+.modal-footer {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 0 20px 16px; gap: 8px;
+}
+.modal-footer .mf-left, .modal-footer .mf-right { display: flex; gap: 8px; }
+.btn-delete { color: var(--c-red); border-color: #FDEDEC; }
+.btn-delete:hover { background: #FDEDEC; border-color: var(--c-red); }
+
+/* ===== Toast ===== */
+.toast-container {
+  position: fixed; top: calc(16px + var(--safe-top)); left: 50%; transform: translateX(-50%);
+  z-index: 2000; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  pointer-events: none;
+}
+.toast {
+  display: flex; align-items: center; gap: 6px; padding: 10px 18px; background: #fff;
+  border-radius: var(--radius-md); box-shadow: var(--shadow-lg); font-size: 13px;
+  animation: toastIn .3s var(--easing); border: 1px solid var(--c-n-200);
+  pointer-events: auto; min-width: 160px; justify-content: center;
+}
+.toast-success { border-left: 3px solid var(--c-green-l); }
+.toast-error { border-left: 3px solid var(--c-red); }
+.toast-info { border-left: 3px solid var(--c-blue-400); }
+.toast-warning { border-left: 3px solid var(--c-orange); }
+
+/* ===== Confirm ===== */
+.confirm-overlay {
+  position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1500;
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn .15s var(--easing);
+}
+.confirm-box {
+  background: #fff; border-radius: var(--radius-lg); box-shadow: var(--shadow-xl);
+  padding: 24px; width: 340px; max-width: 88vw; animation: scaleIn .2s var(--easing);
+}
+.confirm-box .confirm-title { font-size: 15px; font-weight: 600; color: var(--c-n-900); margin-bottom: 6px; }
+.confirm-box .confirm-msg { font-size: 13px; color: var(--c-n-600); margin-bottom: 18px; line-height: 1.6; }
+.confirm-box .confirm-actions { display: flex; justify-content: flex-end; gap: 8px; }
+
+/* ===== Buttons ===== */
+.btn {
+  display: inline-flex; align-items: center; gap: 5px; padding: 7px 14px; border: 1px solid var(--c-n-200);
+  border-radius: var(--radius-sm); background: #fff; color: var(--c-n-700); font-size: 12px;
+  cursor: pointer; transition: all .2s var(--easing); white-space: nowrap; user-select: none;
+  font-family: var(--font); font-weight: 500;
+}
+.btn:hover { background: var(--c-n-50); border-color: var(--c-blue-200); color: var(--c-blue-600); }
+.btn:active { transform: scale(0.97); }
+.btn-primary { background: var(--c-blue-600); border-color: var(--c-blue-600); color: #fff; }
+.btn-primary:hover { background: var(--c-blue-700); border-color: var(--c-blue-700); color: #fff; }
+.btn-sm { padding: 5px 10px; font-size: 11px; }
+.btn-icon { width: 32px; height: 32px; padding: 0; justify-content: center; border-radius: var(--radius-sm); border: none; }
+.btn-ghost { border-color: transparent; background: transparent; }
+.btn-ghost:hover { background: var(--c-n-100); }
+
+/* ===== Animations ===== */
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+@keyframes scaleIn { from { opacity: 0; transform: scale(0.92); } to { opacity: 1; transform: scale(1); } }
+@keyframes slideUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-10px) scale(0.9); } to { opacity: 1; transform: translateY(0) scale(1); } }
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  40% { transform: translateX(4px); }
+  60% { transform: translateX(-3px); }
+  80% { transform: translateX(3px); }
+}
+@keyframes slideOut {
+  from { opacity: 1; transform: translateY(0); }
+  to { opacity: 0; transform: translateY(10px); }
+}
+
+/* ===== PWA install banner ===== */
+.install-banner {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: linear-gradient(135deg, #4A6FA5, #3A5A8C); color: #fff;
+  font-size: 13px; flex-shrink: 0; cursor: pointer;
+}
+.install-banner .install-icon { font-size: 20px; }
+.install-banner .install-text { flex: 1; }
+.install-banner .install-btn {
+  background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);
+  color: #fff; padding: 5px 12px; border-radius: var(--radius-sm); font-size: 12px; cursor: pointer;
+}
+.install-banner .install-close {
+  width: 24px; height: 24px; border: none; background: none; color: rgba(255,255,255,0.7);
+  font-size: 18px; cursor: pointer;
+}
+
+/* ===== Responsive ===== */
+@media (max-width: 1023px) {
+  .week-header, .week-row { grid-template-columns: 44px repeat(7, 1fr); }
+  .slot-label { font-size: 10px; }
+  .slot-label .slot-sub { font-size: 8px; }
+  .slot-cell { min-height: 76px; padding: 3px; }
+}
+@media (max-width: 767px) {
+  :root { --header-h: 48px; }
+  .btn { padding: 6px 10px; font-size: 11px; }
+  .slot-cell { min-height: 68px; padding: 2px; }
+  .task-card { padding: 4px 5px; font-size: 10px; }
+  .task-card .task-cb { width: 12px; height: 12px; }
+  .task-priority { font-size: 8px; padding: 1px 4px; }
+  .add-btn { width: 18px; height: 18px; font-size: 11px; }
+  .month-cell { min-height: 56px; padding: 3px 4px; }
+  .modal-header { padding: 14px 16px 0; }
+  .modal-body { padding: 14px 16px; }
+  .modal-footer { padding: 0 16px 14px; }
+  .form-row { flex-direction: column; gap: 0; }
+  .form-input { font-size: 16px; } /* prevent iOS zoom */
+}
+
+/* PWA standalone mode */
+@media all and (display-mode: standalone) {
+  #app-header { padding-top: calc(0px + var(--safe-top)); }
+  .install-banner { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+  <div id="install-banner" class="install-banner" style="display:none;">
+    <span class="install-icon">📱</span>
+    <span class="install-text">添加到主屏幕，像 App 一样使用</span>
+    <button class="install-btn" id="install-btn">安装</button>
+    <button class="install-close" id="install-close">×</button>
+  </div>
+
+  <header id="app-header">
+    <div class="header-left">
+      <div class="logo">📋</div>
+      <h1>工作计划</h1>
+    </div>
+    <div class="header-right">
+      <button class="btn btn-sm" data-action="export">📥 导出</button>
+      <button class="btn btn-sm" data-action="ical">🔔 日历</button>
+      <button class="btn btn-sm btn-danger" data-action="clear">🗑️</button>
+    </div>
+  </header>
+
+  <nav id="app-nav">
+    <div class="nav-actions">
+      <button class="btn btn-icon btn-ghost" data-action="prev" title="上一周">◀</button>
+      <button class="btn btn-sm btn-ghost" data-action="today" style="margin-left:2px;">今天</button>
+      <button class="btn btn-icon btn-ghost" data-action="next" title="下一周">▶</button>
+    </div>
+    <div class="nav-center">
+      <span class="nav-title" id="nav-title">加载中...</span>
+    </div>
+    <div class="view-tabs">
+      <button class="view-tab active" data-action="view-week">周</button>
+      <button class="view-tab" data-action="view-month">月</button>
+    </div>
+  </nav>
+
+  <section id="app-filter"></section>
+
+  <main id="app-content">
+    <div class="empty-state">
+      <div class="empty-icon">📅</div>
+      <div class="empty-title">加载中...</div>
+    </div>
+  </main>
+</div>
+
+<div id="modal-root"></div>
+<div id="toast-container" class="toast-container"></div>
+
+<script>
+(function(S) {
+'use strict';
+
+/* ===== Utils ===== */
+var Utils = {};
+Utils.generateId = function() {
+  return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+    var r = Math.random() * 16 | 0;
+    return (c === 'x' ? r : (r & 0x3 | 0x8)).toString(16);
+  });
+};
+Utils.formatDate = function(d) {
+  var y = d.getFullYear(), m = String(d.getMonth() + 1).padStart(2, '0'), day = String(d.getDate()).padStart(2, '0');
+  return y + '-' + m + '-' + day;
+};
+Utils.parseDate = function(str) {
+  var p = str.split('-');
+  return new Date(+p[0], +p[1] - 1, +p[2]);
+};
+Utils.isToday = function(dateStr) { return dateStr === Utils.todayStr; };
+Utils.todayStr = Utils.formatDate(new Date());
+Utils.addDays = function(date, n) {
+  var d = new Date(date); d.setDate(d.getDate() + n); return d;
+};
+Utils.getWeekNumber = function(date) {
+  var d = new Date(Date.UTC(date.getFullYear(), date.getMonth(), date.getDate()));
+  var dayNum = (d.getUTCDay() + 6) % 7;
+  d.setUTCDate(d.getUTCDate() - dayNum + 3);
+  var firstThursday = d.valueOf();
+  d.setUTCMonth(0, 1);
+  if (d.getUTCDay() !== 4) d.setUTCMonth(0, 1 + ((4 - d.getUTCDay()) + 7) % 7);
+  return 1 + Math.ceil((firstThursday - d.valueOf()) / 604800000);
+};
+Utils.getWeekLabel = function(date) {
+  var y = date.getFullYear();
+  var wn = Utils.getWeekNumber(date);
+  if (wn === 1 && date.getMonth() === 11) y++;
+  if (wn >= 52 && date.getMonth() === 0) y--;
+  return y + '年第' + wn + '周';
+};
+Utils.getWeekDays = function(date) {
+  var d = new Date(date);
+  var day = d.getDay();
+  var diff = day === 0 ? -6 : 1 - day;
+  var days = [];
+  for (var i = 0; i < 7; i++) {
+    var dd = new Date(d);
+    dd.setDate(d.getDate() + diff + i);
+    days.push(dd);
+  }
+  return days;
+};
+Utils.getDaysInMonth = function(y, m) { return new Date(y, m, 0).getDate(); };
+Utils.getFirstWeekday = function(y, m) {
+  var d = new Date(y, m - 1, 1).getDay();
+  return d === 0 ? 6 : d - 1;
+};
+Utils.getMonthGrid = function(y, m) {
+  var dim = Utils.getDaysInMonth(y, m);
+  var fw = Utils.getFirstWeekday(y, m);
+  var grid = [];
+  for (var i = 0; i < 42; i++) {
+    var dn = i - fw + 1, cd, isCM;
+    if (dn < 1) {
+      var pm = new Date(y, m - 1, 0);
+      dn = pm.getDate() + dn;
+      cd = new Date(y, m - 2, dn); isCM = false;
+    } else if (dn > dim) {
+      dn = dn - dim;
+      cd = new Date(y, m, dn); isCM = false;
+    } else {
+      cd = new Date(y, m - 1, dn); isCM = true;
+    }
+    grid.push({ date: cd, dayNum: dn, isCurrentMonth: isCM });
+  }
+  return grid;
+};
+Utils.toICSDate = function(d) {
+  var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
+  return y + m + day;
+};
+Utils.SLOT_LABELS = { morning: '上午', afternoon: '下午', evening: '晚上' };
+Utils.SLOT_HOURS = { morning: '08:00-12:00', afternoon: '13:00-18:00', evening: '19:00-22:00' };
+Utils.SLOT_DEFAULT = { morning: '09:00', afternoon: '14:00', evening: '20:00' };
+Utils.SLOTS = ['morning', 'afternoon', 'evening'];
+Utils.PRIORITY = { high: { label: '高', color: '#E74C3C', bg: '#FDEDEC' }, medium: { label: '中', color: '#F39C12', bg: '#FEF5E7' }, low: { label: '低', color: '#27AE60', bg: '#E9F7EF' } };
+Utils.el = function(tag, attrs, children) {
+  var el = document.createElement(tag);
+  if (attrs) for (var k in attrs) {
+    if (k === 'className') el.className = attrs[k];
+    else if (k === 'dataset') for (var dk in attrs[k]) el.dataset[dk] = attrs[k][dk];
+    else if (k === 'style' && typeof attrs[k] === 'object') for (var sk in attrs[k]) el.style[sk] = attrs[k][sk];
+    else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), attrs[k]);
+    else el.setAttribute(k, attrs[k]);
+  }
+  if (children) {
+    if (typeof children === 'string') el.textContent = children;
+    else if (Array.isArray(children)) children.forEach(function(c) { if (c != null) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    else el.appendChild(typeof children === 'string' ? document.createTextNode(children) : children);
+  }
+  return el;
+};
+Utils.clear = function(el) { while (el.firstChild) el.removeChild(el.firstChild); };
+Utils.qs = function(s, p) { return (p || document).querySelector(s); };
+Utils.qsa = function(s, p) { return Array.from((p || document).querySelectorAll(s)); };
+S.Utils = Utils;
+})(window.Schedule || (window.Schedule = {}));
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Store = {};
+
+Store.TASKS_KEY = 'schedule_tasks';
+Store.VIEW_KEY = 'schedule_view_mode';
+Store.DATE_KEY = 'schedule_date';
+
+Store.loadTasks = function() {
+  try { var data = localStorage.getItem(Store.TASKS_KEY); return data ? JSON.parse(data) : []; } catch(e) { return []; }
+};
+Store.saveTasks = function(tasks) {
+  try { localStorage.setItem(Store.TASKS_KEY, JSON.stringify(tasks)); } catch(e) { S.Toast && S.Toast.show('存储空间不足', 'error'); }
+};
+Store.getAll = function() { return Store._tasks; };
+Store.getById = function(id) { return Store._tasks.find(function(t) { return t.id === id; }); };
+Store.add = function(data) {
+  var now = new Date().toISOString();
+  var task = {
+    id: Utils.generateId(), title: data.title, description: data.description || '',
+    date: data.date, slot: data.slot, priority: data.priority || 'medium',
+    completed: false, startTime: data.startTime || null, endTime: data.endTime || null,
+    reminderEnabled: !!data.reminderEnabled, reminderMinutes: data.reminderMinutes || 15,
+    createdAt: now, updatedAt: now
+  };
+  Store._tasks.push(task); Store.saveTasks(Store._tasks); return task;
+};
+Store.update = function(id, changes) {
+  changes.updatedAt = new Date().toISOString();
+  var idx = Store._tasks.findIndex(function(t) { return t.id === id; });
+  if (idx === -1) return null;
+  Store._tasks[idx] = Object.assign({}, Store._tasks[idx], changes);
+  Store.saveTasks(Store._tasks); return Store._tasks[idx];
+};
+Store.delete = function(id) {
+  Store._tasks = Store._tasks.filter(function(t) { return t.id !== id; });
+  Store.saveTasks(Store._tasks);
+};
+Store.toggleComplete = function(id) {
+  var t = Store.getById(id); if (!t) return null;
+  t.completed = !t.completed; t.updatedAt = new Date().toISOString();
+  Store.saveTasks(Store._tasks); return t;
+};
+Store.queryByDate = function(date) { return Store._tasks.filter(function(t) { return t.date === date; }); };
+Store.queryBySlot = function(date, slot) { return Store._tasks.filter(function(t) { return t.date === date && t.slot === slot; }); };
+Store.computeStats = function(tasks) {
+  tasks = tasks || Store._tasks;
+  var total = tasks.length, completed = 0, high = 0, medium = 0, low = 0;
+  tasks.forEach(function(t) {
+    if (t.completed) completed++;
+    if (t.priority === 'high') high++; else if (t.priority === 'medium') medium++; else low++;
+  });
+  return { total: total, completed: completed, active: total - completed, high: high, medium: medium, low: low };
+};
+Store.exportJSON = function() { return JSON.stringify(Store._tasks, null, 2); };
+Store.importJSON = function(jsonStr) {
+  var data;
+  try { data = JSON.parse(jsonStr); } catch(e) { return { ok: false, msg: 'JSON 格式错误' }; }
+  if (!Array.isArray(data)) return { ok: false, msg: '数据格式错误' };
+  var vs = ['morning','afternoon','evening'], vp = ['high','medium','low'];
+  var dr = /^\d{4}-\d{2}-\d{2}$/, tr = /^\d{2}:\d{2}$/;
+  for (var i = 0; i < data.length; i++) {
+    var it = data[i];
+    if (!it || typeof it.id !== 'string' || typeof it.title !== 'string' || !it.title ||
+        !dr.test(it.date) || vs.indexOf(it.slot) === -1 || vp.indexOf(it.priority) === -1 ||
+        typeof it.completed !== 'boolean')
+      return { ok: false, msg: '第 ' + (i+1) + ' 条数据格式错误' };
+  }
+  Store._tasks = data; Store.saveTasks(Store._tasks); return { ok: true };
+};
+Store.clearAll = function() { Store._tasks = []; Store.saveTasks(Store._tasks); };
+Store._tasks = Store.loadTasks();
+S.Store = Store;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Toast = {}, container = document.getElementById('toast-container');
+Toast.show = function(message, type, duration) {
+  type = type || 'info'; duration = duration || 2800;
+  var icons = { success: '✅', error: '❌', info: 'ℹ️', warning: '⚠️' };
+  var el = document.createElement('div');
+  el.className = 'toast toast-' + type;
+  el.innerHTML = '<span>' + (icons[type] || 'ℹ️') + ' ' + message + '</span>';
+  container.appendChild(el);
+  setTimeout(function() {
+    el.style.animation = 'slideOut .25s var(--easing) forwards';
+    setTimeout(function() { el.remove(); }, 250);
+  }, duration);
+};
+Toast.success = function(m) { Toast.show(m, 'success'); };
+Toast.error = function(m) { Toast.show(m, 'error'); };
+Toast.info = function(m) { Toast.show(m, 'info'); };
+Toast.warning = function(m) { Toast.show(m, 'warning'); };
+S.Toast = Toast;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Store = S.Store, TaskModal = {};
+TaskModal._overlay = null; TaskModal._editingId = null;
+
+TaskModal.open = function(date, slot) {
+  TaskModal._editingId = null;
+  TaskModal._render({ date: date, slot: slot, title: '', description: '', priority: 'medium', startTime: '', endTime: '', reminderEnabled: false, reminderMinutes: 15, completed: false });
+};
+TaskModal.openById = function(id) {
+  var task = Store.getById(id); if (!task) { S.Toast.error('任务不存在'); return; }
+  TaskModal._editingId = id;
+  TaskModal._render({
+    date: task.date, slot: task.slot, title: task.title, description: task.description || '',
+    priority: task.priority, startTime: task.startTime || '', endTime: task.endTime || '',
+    reminderEnabled: task.reminderEnabled, reminderMinutes: task.reminderMinutes || 15, completed: task.completed
+  });
+};
+TaskModal.close = function() {
+  if (TaskModal._overlay) { TaskModal._overlay.remove(); TaskModal._overlay = null; TaskModal._editingId = null; }
+};
+
+TaskModal._render = function(data) {
+  TaskModal.close();
+  var isEdit = TaskModal._editingId !== null;
+  var overlay = Utils.el('div', { className: 'modal-overlay', onclick: function(e) { if (e.target === overlay) TaskModal.close(); } });
+  var modal = Utils.el('div', { className: 'modal' });
+  var hdr = Utils.el('div', { className: 'modal-header' }, Utils.el('h2', {}, isEdit ? '编辑任务' : '新建任务'));
+  var closeBtn = Utils.el('button', { className: 'modal-close', type: 'button', onclick: TaskModal.close }, '×');
+  hdr.appendChild(closeBtn); modal.appendChild(hdr);
+  var body = Utils.el('div', { className: 'modal-body' });
+
+  // Title
+  var tg = Utils.el('div', { className: 'form-group' });
+  tg.appendChild(Utils.el('label', { className: 'form-label' }, '任务标题 <span class="required">*</span>'));
+  var titleInput = Utils.el('input', { className: 'form-input', type: 'text', maxlength: '100', placeholder: '输入任务名称', value: data.title });
+  tg.appendChild(titleInput); body.appendChild(tg);
+
+  // Description
+  var dg = Utils.el('div', { className: 'form-group' });
+  dg.appendChild(Utils.el('label', { className: 'form-label' }, '描述'));
+  var descInput = Utils.el('textarea', { className: 'form-textarea', maxlength: '500', placeholder: '可选：任务详情、备注...', rows: '3' });
+  descInput.textContent = data.description;
+  dg.appendChild(descInput); body.appendChild(dg);
+
+  // Row: date + slot
+  var r1 = Utils.el('div', { className: 'form-row' });
+  var dateG = Utils.el('div', { className: 'form-group' });
+  dateG.appendChild(Utils.el('label', { className: 'form-label' }, '日期 <span class="required">*</span>'));
+  var dateInput = Utils.el('input', { className: 'form-input', type: 'date', value: data.date });
+  dateG.appendChild(dateInput); r1.appendChild(dateG);
+  var slotG = Utils.el('div', { className: 'form-group' });
+  slotG.appendChild(Utils.el('label', { className: 'form-label' }, '时段 <span class="required">*</span>'));
+  var slotSelect = Utils.el('select', { className: 'form-input' });
+  Utils.SLOTS.forEach(function(s) {
+    var opt = Utils.el('option', { value: s }, Utils.SLOT_LABELS[s] + ' ' + Utils.SLOT_HOURS[s]);
+    if (s === data.slot) opt.selected = true;
+    slotSelect.appendChild(opt);
+  });
+  slotG.appendChild(slotSelect); r1.appendChild(slotG); body.appendChild(r1);
+
+  // Priority
+  var pg = Utils.el('div', { className: 'form-group' });
+  pg.appendChild(Utils.el('label', { className: 'form-label' }, '优先级'));
+  var rg = Utils.el('div', { className: 'radio-group' });
+  [ {k:'high',l:'🔴 高优先级'}, {k:'medium',l:'🟡 中优先级'}, {k:'low',l:'🟢 低优先级'} ].forEach(function(p) {
+    var lbl = Utils.el('label', { className: 'radio-label p-' + p.k + (p.k === data.priority ? ' active' : '') });
+    lbl.appendChild(Utils.el('input', { type: 'radio', name: 'priority', value: p.k, checked: p.k === data.priority }));
+    lbl.appendChild(document.createTextNode(p.l));
+    lbl.addEventListener('click', function() { rg.querySelectorAll('.radio-label').forEach(function(r) { r.className = r.className.replace(/ active/g, ''); }); lbl.className += ' active'; });
+    rg.appendChild(lbl);
+  });
+  pg.appendChild(rg); body.appendChild(pg);
+
+  // Row: time range
+  var r2 = Utils.el('div', { className: 'form-row' });
+  var stG = Utils.el('div', { className: 'form-group' });
+  stG.appendChild(Utils.el('label', { className: 'form-label' }, '开始时间'));
+  var stInput = Utils.el('input', { className: 'form-input', type: 'time', value: data.startTime });
+  stG.appendChild(stInput); r2.appendChild(stG);
+  var etG = Utils.el('div', { className: 'form-group' });
+  etG.appendChild(Utils.el('label', { className: 'form-label' }, '结束时间'));
+  var etInput = Utils.el('input', { className: 'form-input', type: 'time', value: data.endTime });
+  etG.appendChild(etInput); r2.appendChild(etG); body.appendChild(r2);
+
+  // Reminder
+  var remG = Utils.el('div', { className: 'form-group' });
+  remG.appendChild(Utils.el('label', { className: 'form-label' }, '手机提醒 <span class="form-hint">导出到日历后生效</span>'));
+  var remRow = Utils.el('div', { className: 'reminder-group' });
+  var toggleWrap = Utils.el('div', { className: 'toggle-wrap' });
+  var track = Utils.el('div', { className: 'toggle-track' + (data.reminderEnabled ? ' on' : '') });
+  track.appendChild(Utils.el('div', { className: 'toggle-knob' }));
+  toggleWrap.appendChild(track);
+  toggleWrap.appendChild(Utils.el('span', { className: 'toggle-label' }, data.reminderEnabled ? '开启' : '关闭'));
+  toggleWrap.addEventListener('click', function() {
+    data.reminderEnabled = !data.reminderEnabled;
+    track.className = 'toggle-track' + (data.reminderEnabled ? ' on' : '');
+    toggleWrap.querySelector('.toggle-label').textContent = data.reminderEnabled ? '开启' : '关闭';
+  });
+  remRow.appendChild(toggleWrap);
+
+  var remSelect = Utils.el('select', { className: 'form-select-sm', style: { display: data.reminderEnabled ? 'inline-block' : 'none' } });
+  [ {v:5,l:'提前 5 分钟'}, {v:15,l:'提前 15 分钟'}, {v:30,l:'提前 30 分钟'}, {v:60,l:'提前 1 小时'} ].forEach(function(r) {
+    var opt = Utils.el('option', { value: r.v }, r.l);
+    if (r.v === data.reminderMinutes) opt.selected = true;
+    remSelect.appendChild(opt);
+  });
+  remRow.appendChild(remSelect);
+  // toggle select visibility
+  toggleWrap.addEventListener('click', function() { remSelect.style.display = data.reminderEnabled ? 'inline-block' : 'none'; });
+  remG.appendChild(remRow); body.appendChild(remG);
+
+  // Complete checkbox (edit only)
+  var cbInput;
+  if (isEdit) {
+    var cbg = Utils.el('div', { className: 'form-group' });
+    var cbl = Utils.el('label', { className: 'checkbox-label', style: { gap: '8px', fontSize: '13px' } });
+    cbInput = Utils.el('input', { type: 'checkbox', checked: data.completed });
+    cbl.appendChild(cbInput);
+    var completedText = data.completed ? '✅ 已完成' : '⏳ 进行中';
+    cbl.appendChild(document.createTextNode(completedText));
+    cbInput.addEventListener('change', function() {
+      cbl.lastChild.textContent = cbInput.checked ? '✅ 已完成' : '⏳ 进行中';
+    });
+    cbg.appendChild(cbl); body.appendChild(cbg);
+  }
+
+  modal.appendChild(body);
+
+  // Footer
+  var footer = Utils.el('div', { className: 'modal-footer' });
+  var left = Utils.el('div', { className: 'mf-left' });
+  if (isEdit) {
+    left.appendChild(Utils.el('button', { className: 'btn btn-delete btn-sm', onclick: function() { TaskModal._handleDelete(); } }, '🗑️ 删除'));
+  }
+  footer.appendChild(left);
+  var right = Utils.el('div', { className: 'mf-right' });
+  right.appendChild(Utils.el('button', { className: 'btn', onclick: TaskModal.close }, '取消'));
+  right.appendChild(Utils.el('button', { className: 'btn btn-primary', onclick: function() { TaskModal._handleSave(); } }, isEdit ? '保存' : '创建'));
+  footer.appendChild(right); modal.appendChild(footer); overlay.appendChild(modal);
+  document.getElementById('modal-root').appendChild(overlay);
+  TaskModal._overlay = overlay;
+  TaskModal._titleInput = titleInput; TaskModal._descInput = descInput;
+  TaskModal._dateInput = dateInput; TaskModal._slotSelect = slotSelect;
+  TaskModal._stInput = stInput; TaskModal._etInput = etInput;
+  TaskModal._reminderEnabled = data.reminderEnabled; TaskModal._reminderMinutes = data.reminderMinutes;
+  TaskModal._remToggle = toggleWrap; TaskModal._remSelect = remSelect;
+  TaskModal._cbInput = cbInput;
+  var kh = function(e) { if (e.key === 'Escape') TaskModal.close(); if ((e.ctrlKey||e.metaKey) && e.key === 'Enter') TaskModal._handleSave(); };
+  document.addEventListener('keydown', kh); TaskModal._keyHandler = kh;
+  setTimeout(function() { titleInput.focus(); }, 100);
+};
+
+TaskModal._collectFormData = function() {
+  var priority = 'medium';
+  TaskModal._overlay.querySelectorAll('input[name="priority"]').forEach(function(r) { if (r.checked) priority = r.value; });
+  return {
+    title: TaskModal._titleInput.value.trim(), description: TaskModal._descInput.value.trim(),
+    date: TaskModal._dateInput.value, slot: TaskModal._slotSelect.value, priority: priority,
+    startTime: TaskModal._stInput.value || null, endTime: TaskModal._etInput.value || null,
+    reminderEnabled: TaskModal._reminderEnabled,
+    reminderMinutes: parseInt(TaskModal._remSelect.value) || 15,
+    completed: TaskModal._cbInput ? TaskModal._cbInput.checked : false
+  };
+};
+TaskModal._validate = function(data) {
+  var valid = true;
+  if (!data.title) { TaskModal._titleInput.className = 'form-input error'; TaskModal._titleInput.focus(); valid = false; }
+  else TaskModal._titleInput.className = 'form-input';
+  if (!data.date) { TaskModal._dateInput.className = 'form-input error'; valid = false; }
+  else TaskModal._dateInput.className = 'form-input';
+  return valid;
+};
+TaskModal._handleSave = function() {
+  var data = TaskModal._collectFormData();
+  if (!TaskModal._validate(data)) return;
+  if (TaskModal._editingId) { Store.update(TaskModal._editingId, data); S.Toast.success('✅ 任务已更新'); }
+  else { Store.add(data); S.Toast.success('✅ 任务已创建'); }
+  TaskModal.close(); S.App && S.App.refresh();
+};
+TaskModal._handleDelete = function() {
+  S.Confirm.show('删除任务', '确定删除这个任务吗？此操作不可恢复。', function(ok) {
+    if (ok) { Store.delete(TaskModal._editingId); TaskModal.close(); S.App && S.App.refresh(); S.Toast.info('已删除'); }
+  });
+};
+S.TaskModal = TaskModal;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Confirm = {}, overlay = null;
+Confirm.show = function(title, message, callback) {
+  Confirm.hide();
+  var o = document.createElement('div'); o.className = 'confirm-overlay';
+  var box = document.createElement('div'); box.className = 'confirm-box';
+  box.innerHTML = '<div class="confirm-title">' + title + '</div><div class="confirm-msg">' + message + '</div>';
+  var actions = document.createElement('div'); actions.className = 'confirm-actions';
+  var cancelBtn = document.createElement('button'); cancelBtn.className = 'btn'; cancelBtn.textContent = '取消';
+  cancelBtn.onclick = function() { Confirm.hide(); callback(false); };
+  var okBtn = document.createElement('button'); okBtn.className = 'btn btn-primary'; okBtn.textContent = '确定';
+  okBtn.onclick = function() { Confirm.hide(); callback(true); };
+  actions.appendChild(cancelBtn); actions.appendChild(okBtn); box.appendChild(actions);
+  o.appendChild(box); document.body.appendChild(o); overlay = o;
+  setTimeout(function() { okBtn.focus(); }, 50);
+};
+Confirm.hide = function() { if (overlay) { overlay.remove(); overlay = null; } };
+S.Confirm = Confirm;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var DragDrop = {};
+DragDrop.init = function(container) {
+  DragDrop._container = container;
+  container.addEventListener('dragstart', DragDrop._handleDragStart);
+  container.addEventListener('dragover', DragDrop._handleDragOver);
+  container.addEventListener('dragenter', DragDrop._handleDragEnter);
+  container.addEventListener('dragleave', DragDrop._handleDragLeave);
+  container.addEventListener('drop', DragDrop._handleDrop);
+  container.addEventListener('dragend', DragDrop._handleDragEnd);
+};
+DragDrop.destroy = function() {
+  if (!DragDrop._container) return;
+  ['dragstart','dragover','dragenter','dragleave','drop','dragend'].forEach(function(ev) {
+    DragDrop._container.removeEventListener(ev, DragDrop['_handle' + ev[0].toUpperCase() + ev.slice(1)]);
+  });
+};
+DragDrop._handleDragStart = function(e) {
+  var card = e.target.closest('.task-card'); if (!card) return;
+  var taskId = card.dataset.taskId; if (!taskId) return;
+  card.classList.add('dragging');
+  e.dataTransfer.effectAllowed = 'move';
+  e.dataTransfer.setData('text/plain', JSON.stringify({ taskId: taskId, sourceDate: card.dataset.date, sourceSlot: card.dataset.slot }));
+};
+DragDrop._handleDragOver = function(e) { var cell = e.target.closest('.slot-cell'); if (cell) { e.preventDefault(); e.dataTransfer.dropEffect = 'move'; } };
+DragDrop._handleDragEnter = function(e) { var cell = e.target.closest('.slot-cell'); if (cell) cell.classList.add('drop-target'); };
+DragDrop._handleDragLeave = function(e) { var cell = e.target.closest('.slot-cell'); if (cell && !cell.contains(e.relatedTarget)) cell.classList.remove('drop-target'); };
+DragDrop._handleDrop = function(e) {
+  e.preventDefault(); var cell = e.target.closest('.slot-cell'); if (!cell) return;
+  cell.classList.remove('drop-target');
+  var data; try { data = JSON.parse(e.dataTransfer.getData('text/plain')); } catch(ex) { return; }
+  if (!data || !data.taskId) return;
+  var td = cell.dataset.date, ts = cell.dataset.slot;
+  if (!td || !ts) return;
+  var card = DragDrop._container.querySelector('.task-card.dragging'); if (card) card.classList.remove('dragging');
+  if (data.sourceDate === td && data.sourceSlot === ts) return;
+  Store.update(data.taskId, { date: td, slot: ts }); S.Toast.info('📌 任务已移动'); S.App && S.App.refresh();
+};
+DragDrop._handleDragEnd = function() {
+  if (DragDrop._container) {
+    DragDrop._container.querySelectorAll('.task-card.dragging').forEach(function(el) { el.classList.remove('dragging'); });
+    DragDrop._container.querySelectorAll('.drop-target').forEach(function(el) { el.classList.remove('drop-target'); });
+  }
+};
+S.DragDrop = DragDrop;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Calendar = {};
+Calendar.prev = function(state) {
+  if (state.viewMode === 'month') { var d = Utils.parseDate(state.currentDate); return { currentDate: Utils.formatDate(new Date(d.getFullYear(), d.getMonth() - 1, 1)) }; }
+  else { var d = Utils.parseDate(state.currentDate); d.setDate(d.getDate() - 7); return { currentDate: Utils.formatDate(d) }; }
+};
+Calendar.next = function(state) {
+  if (state.viewMode === 'month') { var d = Utils.parseDate(state.currentDate); return { currentDate: Utils.formatDate(new Date(d.getFullYear(), d.getMonth() + 1, 1)) }; }
+  else { var d = Utils.parseDate(state.currentDate); d.setDate(d.getDate() + 7); return { currentDate: Utils.formatDate(d) }; }
+};
+Calendar.today = function() { return { currentDate: Utils.todayStr }; };
+Calendar.getLabel = function(state) {
+  var d = Utils.parseDate(state.currentDate);
+  return state.viewMode === 'month' ? d.getFullYear() + '年' + (d.getMonth()+1) + '月' : Utils.getWeekLabel(d);
+};
+S.Calendar = Calendar;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Store = S.Store, Filter = {};
+Filter.apply = function(tasks, priority, status) {
+  var r = tasks.slice();
+  if (priority) r = r.filter(function(t) { return t.priority === priority; });
+  if (status === 'active') r = r.filter(function(t) { return !t.completed; });
+  else if (status === 'completed') r = r.filter(function(t) { return t.completed; });
+  return r;
+};
+S.Filter = Filter;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Store = S.Store, DataManager = {};
+
+DataManager.exportJSON = function() {
+  var json = Store.exportJSON(); var blob = new Blob([json], { type: 'application/json' });
+  var url = URL.createObjectURL(blob); var a = document.createElement('a');
+  a.href = url; a.download = '工作计划_' + Utils.todayStr + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 100); S.Toast.success('📥 导出成功');
+};
+
+DataManager.importJSON = function() {
+  var input = document.createElement('input'); input.type = 'file'; input.accept = '.json';
+  input.onchange = function(e) {
+    var file = e.target.files[0]; if (!file) return;
+    var reader = new FileReader();
+    reader.onload = function(ev) {
+      var result = Store.importJSON(ev.target.result);
+      if (result.ok) {
+        S.Confirm.show('导入数据', '将替换当前所有 ' + Store._tasks.length + ' 条任务，确定吗？', function(ok) {
+          if (ok) { S.App && S.App.refresh(); S.Toast.success('📤 导入成功'); }
+          else { Store._tasks = Store.loadTasks(); S.App && S.App.refresh(); }
+        });
+      } else { S.Toast.error(result.msg); }
+    };
+    reader.readAsText(file);
+  };
+  input.click();
+};
+
+DataManager.clearData = function() {
+  var total = Store._tasks.length;
+  if (total === 0) { S.Toast.info('暂无数据'); return; }
+  S.Confirm.show('清空数据', '确定清空全部 ' + total + ' 条任务？<br>此操作不可恢复。', function(ok) {
+    if (ok) { Store.clearAll(); S.App && S.App.refresh(); S.Toast.info('🗑️ 已清空'); }
+  });
+};
+
+DataManager.exportICS = function() {
+  var tasks = Store.getAll().filter(function(t) { return !t.completed; });
+  if (tasks.length === 0) { S.Toast.info('没有待办任务可导出'); return; }
+  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Schedule//CN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:工作计划\r\n';
+  tasks.forEach(function(t) {
+    var d = Utils.parseDate(t.date);
+    var startH = t.startTime ? t.startTime.split(':') : Utils.SLOT_DEFAULT[t.slot].split(':');
+    var endH = t.endTime ? t.endTime.split(':') : [String(parseInt(startH[0]) + 1), startH[1]];
+    var ds = Utils.toICSDate(d);
+    var ss = ds + 'T' + startH[0] + startH[1] + '00';
+    var es = ds + 'T' + endH[0] + endH[1] + '00';
+    var desc = t.description ? t.description.replace(/\n/g, '\\n') : '';
+    ics += 'BEGIN:VEVENT\r\nUID:' + t.id + '@schedule\r\nDTSTART:' + ss + '\r\nDTEND:' + es + '\r\nSUMMARY:' + t.title + '\r\nDESCRIPTION:' + (desc || Utils.SLOT_LABELS[t.slot]) + '\r\n';
+    if (t.reminderEnabled) {
+      ics += 'BEGIN:VALARM\r\nTRIGGER:-PT' + t.reminderMinutes + 'M\r\nACTION:AUDIO\r\nEND:VALARM\r\n';
+    }
+    ics += 'END:VEVENT\r\n';
+  });
+  ics += 'END:VCALENDAR\r\n';
+  var blob = new Blob([ics], { type: 'text/calendar;charset=utf-8' });
+  var url = URL.createObjectURL(blob); var a = document.createElement('a');
+  a.href = url; a.download = '工作计划_' + Utils.todayStr + '.ics';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function() { URL.revokeObjectURL(url); }, 100);
+  var cnt = tasks.filter(function(t) { return t.reminderEnabled; }).length;
+  S.Toast.success('🔔 导出 ' + tasks.length + ' 个任务' + (cnt > 0 ? ' (' + cnt + ' 个带提醒)' : ''));
+};
+
+S.DataManager = DataManager;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Store = S.Store, Calendar = S.Calendar, Filter = S.Filter;
+var DragDrop = S.DragDrop, TaskModal = S.TaskModal, DataManager = S.DataManager;
+var App = {};
+
+App.state = {
+  tasks: [], viewMode: 'week', currentDate: Utils.todayStr,
+  filterPriority: null, filterStatus: null
+};
+
+App.init = function() {
+  try {
+    var vm = localStorage.getItem(Store.VIEW_KEY); if (vm === 'week' || vm === 'month') App.state.viewMode = vm;
+    var dt = localStorage.getItem(Store.DATE_KEY); if (dt) App.state.currentDate = dt;
+  } catch(e) {}
+  App.state.tasks = Store.getAll();
+  App._bindEvents();
+  App.refresh();
+  App._setupPWA();
+};
+
+App.setState = function(partial) {
+  for (var k in partial) App.state[k] = partial[k];
+  try { localStorage.setItem(Store.VIEW_KEY, App.state.viewMode); localStorage.setItem(Store.DATE_KEY, App.state.currentDate); } catch(e) {}
+  App.refresh();
+};
+
+App.refresh = function() {
+  App.state.tasks = Store.getAll();
+  var content = document.getElementById('app-content');
+  document.getElementById('nav-title').textContent = Calendar.getLabel(App.state);
+
+  document.querySelectorAll('.view-tab').forEach(function(tab) {
+    var mode = tab.dataset.action === 'view-week' ? 'week' : 'month';
+    tab.classList.toggle('active', mode === App.state.viewMode);
+  });
+
+  Utils.clear(content);
+
+  if (App.state.tasks.length === 0) {
+    var empty = Utils.el('div', { className: 'empty-state' },
+      Utils.el('div', { className: 'empty-icon' }, '📋')
+    );
+    empty.appendChild(Utils.el('div', { className: 'empty-title' }, '还没有工作计划'));
+    empty.appendChild(Utils.el('div', { className: 'empty-desc' }, '点击时段格中的「+」创建任务，也可长按拖拽调整'));
+    content.appendChild(empty);
+  }
+
+  if (App.state.viewMode === 'week') App._renderWeekView(content);
+  else App._renderMonthView(content);
+
+  App._renderFilterBar();
+};
+
+App._renderWeekView = function(container) {
+  var weekDays = Utils.getWeekDays(Utils.parseDate(App.state.currentDate));
+  var dateStrs = weekDays.map(function(dd) { return Utils.formatDate(dd); });
+  var tasks = Filter.apply(App.state.tasks, App.state.filterPriority, App.state.filterStatus);
+  var taskMap = {};
+  tasks.forEach(function(t) {
+    var key = t.date + ':' + t.slot; if (!taskMap[key]) taskMap[key] = [];
+    taskMap[key].push(t);
+  });
+
+  var wk = Utils.el('div', { className: 'week-view' });
+  var header = Utils.el('div', { className: 'week-header' });
+  header.appendChild(Utils.el('div', { className: 'wh-cell' }));
+  var wdn = ['一','二','三','四','五','六','日'];
+  weekDays.forEach(function(dd, i) {
+    var ds = Utils.formatDate(dd);
+    var hc = Utils.el('div', { className: 'wh-cell' + (Utils.isToday(ds) ? ' today' : '') });
+    hc.appendChild(document.createTextNode(wdn[i]));
+    hc.appendChild(Utils.el('span', { className: 'wh-date' }, dd.getMonth()+1 + '/' + dd.getDate()));
+    header.appendChild(hc);
+  });
+  wk.appendChild(header);
+
+  var body = Utils.el('div', { className: 'week-body' });
+  Utils.SLOTS.forEach(function(slot) {
+    var row = Utils.el('div', { className: 'week-row' });
+    var lbl = Utils.el('div', { className: 'slot-label' });
+    lbl.appendChild(document.createTextNode(Utils.SLOT_LABELS[slot]));
+    lbl.appendChild(Utils.el('span', { className: 'slot-sub' }, Utils.SLOT_HOURS[slot]));
+    row.appendChild(lbl);
+
+    weekDays.forEach(function(dd) {
+      var ds = Utils.formatDate(dd);
+      var cell = Utils.el('div', { className: 'slot-cell' + (Utils.isToday(ds) ? ' today-col' : ''), dataset: { date: ds, slot: slot } });
+      var key = ds + ':' + slot;
+      (taskMap[key] || []).forEach(function(task) { cell.appendChild(App._createTaskCard(task)); });
+      if (!taskMap[key] && App.state.tasks.length > 0) {
+        cell.appendChild(Utils.el('div', { style: { color: '#D0D8E0', fontSize: '10px', paddingTop: '4px' } }, '—'));
+      }
+      cell.appendChild(Utils.el('button', { className: 'add-btn', dataset: { action: 'create-task', date: ds, slot: slot }, title: '新建' }, '+'));
+      row.appendChild(cell);
+    });
+    body.appendChild(row);
+  });
+  wk.appendChild(body);
+  container.appendChild(wk);
+
+  DragDrop.destroy(); DragDrop.init(wk);
+  wk.querySelectorAll('.task-card').forEach(function(card) { card.draggable = true; });
+};
+
+App._renderMonthView = function(container) {
+  var d = Utils.parseDate(App.state.currentDate);
+  var y = d.getFullYear(), m = d.getMonth() + 1;
+  var grid = Utils.getMonthGrid(y, m);
+  var tasks = Filter.apply(App.state.tasks, App.state.filterPriority, App.state.filterStatus);
+  var cm = {}, pm = {};
+  tasks.forEach(function(t) {
+    if (!cm[t.date]) { cm[t.date] = 0; pm[t.date] = []; }
+    cm[t.date]++; pm[t.date].push(t.priority + (t.completed ? '-done' : ''));
+  });
+  for (var dt in pm) { if (pm[dt].length > 5) pm[dt] = pm[dt].slice(0,5); }
+
+  var mv = Utils.el('div', { className: 'month-view' });
+  var mh = Utils.el('div', { className: 'month-header' });
+  ['周一','周二','周三','周四','周五','周六','周日'].forEach(function(day) { mh.appendChild(Utils.el('div', { className: 'mh-cell' }, day)); });
+  mv.appendChild(mh);
+  var mg = Utils.el('div', { className: 'month-grid' });
+  grid.forEach(function(cell) {
+    var ds = Utils.formatDate(cell.date);
+    var cls = 'month-cell' + (!cell.isCurrentMonth ? ' other-month' : '') + (Utils.isToday(ds) ? ' today' : '');
+    var div = Utils.el('div', { className: cls, dataset: { date: ds } });
+    div.appendChild(Utils.el('span', { className: 'mc-day' }, String(cell.dayNum)));
+    if (cm[ds]) {
+      var dots = Utils.el('div', { className: 'mc-dots' });
+      (pm[ds] || []).forEach(function(p) {
+        var dot = Utils.el('span', { className: 'mc-dot ' + p.replace('-done','') });
+        if (p.indexOf('done') !== -1) dot.className += ' done';
+        dots.appendChild(dot);
+      });
+      if (cell.isCurrentMonth) div.appendChild(Utils.el('span', { className: 'mc-count' }, cm[ds] + '项'));
+      div.appendChild(dots);
+    }
+    if (cell.isCurrentMonth) {
+      div.addEventListener('dblclick', function() { TaskModal.open(ds, 'morning'); });
+    }
+    mg.appendChild(div);
+  });
+  mv.appendChild(mg); container.appendChild(mv);
+};
+
+App._createTaskCard = function(task) {
+  var cls = 'task-card p-' + task.priority;
+  if (task.completed) cls += ' completed';
+  if (task.reminderEnabled) cls += ' has-alarm';
+  var card = Utils.el('div', { className: cls, dataset: { taskId: task.id, date: task.date, slot: task.slot, action: 'edit-task' }, draggable: 'true' });
+  var hdr = Utils.el('div', { className: 'task-header' });
+  var cb = Utils.el('input', { type: 'checkbox', className: 'task-cb', checked: task.completed, dataset: { action: 'toggle-task', taskId: task.id }, onclick: function(e) { e.stopPropagation(); } });
+  hdr.appendChild(cb);
+  hdr.appendChild(Utils.el('div', { className: 'task-title' }, task.title));
+  card.appendChild(hdr);
+  var ft = Utils.el('div', { className: 'task-footer' });
+  ft.appendChild(Utils.el('span', { className: 'task-priority ' + task.priority }, S.Utils.PRIORITY[task.priority].label));
+  if (task.startTime) {
+    var ts = task.startTime; if (task.endTime) ts += ' - ' + task.endTime;
+    ft.appendChild(Utils.el('span', { className: 'task-time' }, ts));
+  }
+  if (task.reminderEnabled) ft.appendChild(Utils.el('span', { className: 'task-alarm-icon' }, '🔔'));
+  card.appendChild(ft);
+  return card;
+};
+
+App._renderFilterBar = function() {
+  var el = document.getElementById('app-filter'); Utils.clear(el);
+  var left = Utils.el('div', { className: 'filter-group' });
+  left.appendChild(Utils.el('span', { className: 'filter-label' }, '优先级：'));
+  [{k:null,l:'全部'},{k:'high',l:'高'},{k:'medium',l:'中'},{k:'low',l:'低'}].forEach(function(f) {
+    left.appendChild(Utils.el('button', { className: 'filter-btn' + (App.state.filterPriority === f.k ? ' active' : '') + (f.k ? ' p-' + f.k : ''), dataset: { action: 'filter-priority', filter: f.k || 'all' } }, f.l));
+  });
+  left.appendChild(Utils.el('span', { className: 'filter-label', style: { marginLeft: '8px' } }, '状态：'));
+  [{k:null,l:'全部'},{k:'active',l:'进行'},{k:'completed',l:'完成'}].forEach(function(f) {
+    left.appendChild(Utils.el('button', { className: 'filter-btn' + (App.state.filterStatus === f.k ? ' active' : ''), dataset: { action: 'filter-status', filter: f.k || 'all' } }, f.l));
+  });
+  el.appendChild(left);
+  var stats = Store.computeStats();
+  var right = Utils.el('div', { className: 'stats' });
+  right.appendChild(Utils.el('span', { className: 'stat-item' }, '📋' + stats.total));
+  if (stats.active > 0) right.appendChild(Utils.el('span', { className: 'stat-item' }, '⏳' + stats.active));
+  if (stats.completed > 0) right.appendChild(Utils.el('span', { className: 'stat-item' }, '✅' + stats.completed));
+  el.appendChild(right);
+};
+
+App._bindEvents = function() {
+  document.getElementById('app').addEventListener('click', function(e) {
+    var target = e.target.closest('[data-action]'); if (!target) return;
+    switch (target.dataset.action) {
+      case 'prev': App.setState(Calendar.prev(App.state)); break;
+      case 'next': App.setState(Calendar.next(App.state)); break;
+      case 'today': App.setState(Calendar.today()); break;
+      case 'view-week': App.setState({ viewMode: 'week' }); break;
+      case 'view-month': App.setState({ viewMode: 'month' }); break;
+      case 'create-task': TaskModal.open(target.dataset.date, target.dataset.slot); break;
+      case 'edit-task': TaskModal.openById(target.dataset.taskId); break;
+      case 'toggle-task': Store.toggleComplete(target.dataset.taskId); App.refresh(); break;
+      case 'filter-priority': App.setState({ filterPriority: target.dataset.filter === 'all' ? null : target.dataset.filter }); break;
+      case 'filter-status': App.setState({ filterStatus: target.dataset.filter === 'all' ? null : target.dataset.filter }); break;
+      case 'export': DataManager.exportJSON(); break;
+      case 'ical': DataManager.exportICS(); break;
+      case 'clear': DataManager.clearData(); break;
+      case 'import': DataManager.importJSON(); break;
+    }
+  });
+};
+
+App._setupPWA = function() {
+  var banner = document.getElementById('install-banner');
+  var closeBtn = document.getElementById('install-close');
+  var installBtn = document.getElementById('install-btn');
+  var deferredPrompt = null;
+
+  // Hide if already dismissed
+  if (localStorage.getItem('pwa_dismissed')) { banner.style.display = 'none'; return; }
+
+  window.addEventListener('beforeinstallprompt', function(e) {
+    e.preventDefault(); deferredPrompt = e;
+    banner.style.display = 'flex';
+  });
+
+  installBtn.addEventListener('click', function() {
+    if (deferredPrompt) {
+      deferredPrompt.prompt();
+      deferredPrompt.userChoice.then(function(result) {
+        if (result.outcome === 'accepted') { banner.style.display = 'none'; }
+        deferredPrompt = null;
+      });
+    } else {
+      S.Toast.info('请在浏览器菜单中选择「添加到主屏幕」');
+    }
+  });
+
+  closeBtn.addEventListener('click', function() {
+    banner.style.display = 'none';
+    localStorage.setItem('pwa_dismissed', '1');
+  });
+
+  // Register service worker
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js').catch(function() {});
+  }
+};
+
+S.App = App;
+})(window.Schedule);
+
+(function() { Schedule.App.init(); })();
+</script>
+</body>
+</html>
