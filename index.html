@@ -426,6 +426,7 @@ body {
       <h1>工作计划</h1>
     </div>
     <div class="header-right">
+      <button class="btn btn-sm" data-action="template">📋 模板</button>
       <button class="btn btn-sm" data-action="export">📥 导出</button>
       <button class="btn btn-sm" data-action="ical">🔔 日历</button>
       <button class="btn btn-sm btn-danger" data-action="clear">🗑️</button>
@@ -640,7 +641,56 @@ Store.importJSON = function(jsonStr) {
   Store._tasks = data; Store.saveTasks(Store._tasks); return { ok: true };
 };
 Store.clearAll = function() { Store._tasks = []; Store.saveTasks(Store._tasks); };
-Store._tasks = Store.loadTasks();
+
+// Templates
+Store.TEMPLATES_KEY = 'schedule_templates';
+Store.loadTemplates = function() {
+  try { var d = localStorage.getItem(Store.TEMPLATES_KEY); return d ? JSON.parse(d) : []; } catch(e) { return []; }
+};
+Store.saveTemplates = function(t) { try { localStorage.setItem(Store.TEMPLATES_KEY, JSON.stringify(t)); } catch(e) {} };
+Store.getTemplates = function() { return Store._templates; };
+Store.addTemplate = function(name, weekTasks) {
+  var wkMap = ['sunday','monday','tuesday','wednesday','thursday','friday','saturday'];
+  var tmpl = {
+    id: Utils.generateId(), name: name,
+    tasks: weekTasks.map(function(t) {
+      var d = Utils.parseDate(t.date);
+      return {
+        weekday: (d.getDay() + 6) % 7,
+        slot: t.slot, title: t.title, description: t.description || '',
+        priority: t.priority, startTime: t.startTime || null, endTime: t.endTime || null,
+        reminderEnabled: t.reminderEnabled, reminderMinutes: t.reminderMinutes || 15
+      };
+    }),
+    createdAt: new Date().toISOString(), updatedAt: new Date().toISOString()
+  };
+  Store._templates.push(tmpl); Store.saveTemplates(Store._templates); return tmpl;
+};
+Store.deleteTemplate = function(id) {
+  Store._templates = Store._templates.filter(function(t) { return t.id !== id; });
+  Store.saveTemplates(Store._templates);
+};
+Store.renameTemplate = function(id, newName) {
+  var t = Store._templates.find(function(t) { return t.id === id; });
+  if (t) { t.name = newName; t.updatedAt = new Date().toISOString(); Store.saveTemplates(Store._templates); }
+};
+Store.applyTemplate = function(id, weekDates) {
+  var tmpl = Store._templates.find(function(t) { return t.id === id; });
+  if (!tmpl) return 0;
+  var count = 0;
+  tmpl.tasks.forEach(function(tt) {
+    var dateStr = weekDates[tt.weekday]; if (!dateStr) return;
+    var exists = Store._tasks.some(function(t) { return t.date === dateStr && t.slot === tt.slot && t.title === tt.title; });
+    if (!exists) {
+      Store.add({ title: tt.title, description: tt.description, date: dateStr, slot: tt.slot,
+        priority: tt.priority, startTime: tt.startTime, endTime: tt.endTime,
+        reminderEnabled: tt.reminderEnabled, reminderMinutes: tt.reminderMinutes });
+      count++;
+    }
+  });
+  return count;
+};
+Store._templates = Store.loadTemplates();
 S.Store = Store;
 })(window.Schedule);
 
@@ -873,6 +923,102 @@ Confirm.show = function(title, message, callback) {
 };
 Confirm.hide = function() { if (overlay) { overlay.remove(); overlay = null; } };
 S.Confirm = Confirm;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
+var Utils = S.Utils, Store = S.Store, TemplateManager = {};
+
+TemplateManager.open = function() {
+  var overlay = Utils.el('div', { className: 'modal-overlay', onclick: function(e) { if (e.target === overlay) TemplateManager.close(); } });
+  var modal = Utils.el('div', { className: 'modal' });
+  var hdr = Utils.el('div', { className: 'modal-header' }, Utils.el('h2', {}, '📋 周模板'));
+  var closeBtn = Utils.el('button', { className: 'modal-close', type: 'button', onclick: TemplateManager.close }, '×');
+  hdr.appendChild(closeBtn); modal.appendChild(hdr);
+  var body = Utils.el('div', { className: 'modal-body' });
+
+  var templates = Store.getTemplates();
+
+  if (templates.length === 0) {
+    var empty = Utils.el('div', { style: { textAlign: 'center', padding: '30px 0', color: '#A0AAB4' } });
+    empty.innerHTML = '<div style="font-size:36px;margin-bottom:10px;">📋</div><div style="font-size:14px;margin-bottom:4px;">还没有模板</div><div style="font-size:12px;">先排好一周计划，再点「保存本周为模板」</div>';
+    body.appendChild(empty);
+  } else {
+    var list = Utils.el('div', { style: { display: 'flex', flexDirection: 'column', gap: '8px' } });
+    templates.forEach(function(tmpl) {
+      var card = Utils.el('div', { style: { border: '1px solid #E5E8EB', borderRadius: '8px', padding: '12px 14px' } });
+      var row1 = Utils.el('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between' } });
+      var nameSpan = Utils.el('span', { style: { fontWeight: 600, fontSize: '14px', color: '#2C3E50' } }, tmpl.name);
+      row1.appendChild(nameSpan);
+      var countSpan = Utils.el('span', { style: { fontSize: '12px', color: '#A0AAB4' } }, tmpl.tasks.length + ' 项');
+      row1.appendChild(countSpan);
+      card.appendChild(row1);
+      var row2 = Utils.el('div', { style: { display: 'flex', gap: '6px', marginTop: '8px', flexWrap: 'wrap' } });
+      row2.appendChild(Utils.el('button', { className: 'btn btn-sm btn-primary', onclick: function() { TemplateManager._handleApply(tmpl.id); } }, '套用到本周'));
+      row2.appendChild(Utils.el('button', { className: 'btn btn-sm', onclick: function() { TemplateManager._handleRename(tmpl.id); } }, '重命名'));
+      row2.appendChild(Utils.el('button', { className: 'btn btn-sm btn-delete', onclick: function() { TemplateManager._handleDelete(tmpl.id); } }, '删除'));
+      card.appendChild(row2);
+      list.appendChild(card);
+    });
+    body.appendChild(list);
+  }
+
+  body.appendChild(Utils.el('div', { style: { marginTop: '16px' } },
+    Utils.el('button', { className: 'btn btn-primary', style: { width: '100%', justifyContent: 'center' }, onclick: TemplateManager._handleSaveCurrent }, '💾 保存本周为模板')
+  ));
+
+  modal.appendChild(body);
+  var footer = Utils.el('div', { className: 'modal-footer' });
+  var right = Utils.el('div', { className: 'mf-right' });
+  right.appendChild(Utils.el('button', { className: 'btn', onclick: TemplateManager.close }, '关闭'));
+  footer.appendChild(right); modal.appendChild(footer); overlay.appendChild(modal);
+  document.getElementById('modal-root').appendChild(overlay);
+  TemplateManager._overlay = overlay;
+};
+
+TemplateManager.close = function() { if (TemplateManager._overlay) { TemplateManager._overlay.remove(); TemplateManager._overlay = null; } };
+
+TemplateManager._handleSaveCurrent = function() {
+  var weekDays = Utils.getWeekDays(Utils.parseDate(S.App.state.currentDate));
+  var dateStrs = weekDays.map(function(d) { return Utils.formatDate(d); });
+  var weekTasks = Store._tasks.filter(function(t) { return dateStrs.indexOf(t.date) !== -1 && !t.completed; });
+  if (weekTasks.length === 0) { S.Toast.info('本周没有待办任务可以保存'); return; }
+  var name = prompt('模板名称：', '周计划');
+  if (!name || !name.trim()) return;
+  Store.addTemplate(name.trim(), weekTasks);
+  S.Toast.success('✅ 模板已保存 (' + weekTasks.length + ' 项)');
+  TemplateManager.open(); // Refresh
+};
+
+TemplateManager._handleApply = function(id) {
+  var weekDays = Utils.getWeekDays(Utils.parseDate(S.App.state.currentDate));
+  var dateStrs = weekDays.map(function(d) { return Utils.formatDate(d); });
+  var count = Store.applyTemplate(id, dateStrs);
+  if (count > 0) {
+    S.Toast.success('✅ 已套用 ' + count + ' 项任务');
+    TemplateManager.close();
+    S.App && S.App.refresh();
+  } else {
+    S.Toast.info('任务已存在，无新增项');
+  }
+};
+
+TemplateManager._handleDelete = function(id) {
+  S.Confirm.show('删除模板', '确定删除这个模板吗？', function(ok) {
+    if (ok) { Store.deleteTemplate(id); S.Toast.info('已删除'); TemplateManager.open(); }
+  });
+};
+
+TemplateManager._handleRename = function(id) {
+  var tmpl = Store.getTemplates().find(function(t) { return t.id === id; });
+  if (!tmpl) return;
+  var name = prompt('新名称：', tmpl.name);
+  if (!name || !name.trim()) return;
+  Store.renameTemplate(id, name.trim());
+  TemplateManager.open();
+};
+
+S.TemplateManager = TemplateManager;
 })(window.Schedule);
 
 (function(S) {
@@ -1226,6 +1372,7 @@ App._bindEvents = function() {
       case 'toggle-task': Store.toggleComplete(target.dataset.taskId); App.refresh(); break;
       case 'filter-priority': App.setState({ filterPriority: target.dataset.filter === 'all' ? null : target.dataset.filter }); break;
       case 'filter-status': App.setState({ filterStatus: target.dataset.filter === 'all' ? null : target.dataset.filter }); break;
+      case 'template': S.TemplateManager.open(); break;
       case 'export': DataManager.exportJSON(); break;
       case 'ical': DataManager.exportICS(); break;
       case 'clear': DataManager.clearData(); break;
