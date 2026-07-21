@@ -7,11 +7,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="apple-mobile-web-app-title" content="工作计划">
+<meta name="apple-mobile-web-app-title" content="懒人工具百宝箱">
 <link rel="manifest" href="./manifest.json">
 <link rel="icon" href="./icon.svg" type="image/svg+xml">
 <link rel="apple-touch-icon" href="./icon.svg">
-<title>工作计划安排表</title>
+<title>懒人工具百宝箱</title>
 <style>
 :root {
   --c-blue-50: #F0F4F8; --c-blue-100: #E1E8F0; --c-blue-200: #C5D3E0;
@@ -505,8 +505,8 @@ body {
 
   <header id="app-header">
     <div class="header-left">
-      <div class="logo">📋</div>
-      <h1>工作计划</h1>
+      <div class="logo">🧰</div>
+      <h1>懒人工具百宝箱</h1>
     </div>
     <div class="header-right">
       <button class="btn btn-sm" data-action="template">📋 模板</button>
@@ -1268,7 +1268,7 @@ DataManager.clearData = function() {
 DataManager.exportICS = function() {
   var tasks = Store.getAll().filter(function(t) { return !t.completed; });
   if (tasks.length === 0) { S.Toast.info('没有待办任务可导出'); return; }
-  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Schedule//CN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:工作计划\r\n';
+  var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Schedule//CN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:懒人工具百宝箱\r\n';
   tasks.forEach(function(t) {
     var d = Utils.parseDate(t.date);
     var startH = t.startTime ? t.startTime.split(':') : Utils.SLOT_DEFAULT[t.slot].split(':');
@@ -1507,7 +1507,7 @@ App.refresh = function() {
   Utils.clear(content);
 
   if (App.state.page === 'home') {
-    header.textContent = '计划记账';
+    header.textContent = '懒人工具百宝箱';
     nav.style.display = 'none';
     filter.style.display = 'none';
     App._removeHomeBtn();
@@ -1520,7 +1520,7 @@ App.refresh = function() {
   App._ensureHomeBtn();
 
   if (App.state.page === 'accounting') {
-    header.textContent = '💰 记账本';
+    header.textContent = '💰 灿灿的小金库';
     nav.style.display = 'none';
     filter.style.display = 'none';
     Accounting.render(content);
@@ -1529,7 +1529,7 @@ App.refresh = function() {
   }
 
   // Schedule page
-  header.textContent = '📋 工作计划';
+  header.textContent = '📋 祁老师暑假工作表';
   nav.style.display = '';
   filter.style.display = '';
   document.getElementById('nav-title').textContent = Calendar.getLabel(App.state);
@@ -1556,14 +1556,14 @@ App.renderHome = function(container) {
   // Schedule card
   var sc = Utils.el('div', { className: 'home-card card-schedule', dataset: { action: 'go-schedule' } });
   sc.appendChild(Utils.el('div', { className: 'hc-icon' }, '📋'));
-  sc.appendChild(Utils.el('div', { className: 'hc-title' }, '工作计划'));
-  sc.appendChild(Utils.el('div', { className: 'hc-desc' }, '按周安排工作任务<br>自由拖拽调整'));
+  sc.appendChild(Utils.el('div', { className: 'hc-title' }, '祁老师暑假工作表'));
+  sc.appendChild(Utils.el('div', { className: 'hc-desc' }, '安排暑假学习任务<br>按周自由规划'));
   hp.appendChild(sc);
   // Accounting card
   var ac = Utils.el('div', { className: 'home-card card-accounting', dataset: { action: 'go-accounting' } });
   ac.appendChild(Utils.el('div', { className: 'hc-icon' }, '💰'));
-  ac.appendChild(Utils.el('div', { className: 'hc-title' }, '记账本'));
-  ac.appendChild(Utils.el('div', { className: 'hc-desc' }, '记录每日收支<br>看余额慢慢增长'));
+  ac.appendChild(Utils.el('div', { className: 'hc-title' }, '灿灿的小金库'));
+  ac.appendChild(Utils.el('div', { className: 'hc-desc' }, '记录每日收支<br>看小金库慢慢增长'));
   hp.appendChild(ac);
   container.appendChild(hp);
 };
