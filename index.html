@@ -418,8 +418,8 @@ body {
   .acc-stat-item { padding: 8px 4px; }
   .acc-stat-item .stat-value { font-size: clamp(10px, 3vw, 14px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* Mobile: calendar cells */
-  .acc-c-cell { min-height: 52px; padding: 3px 2px; }
-  .acc-c-cell .acc-amount { font-size: clamp(8px, 2.5vw, 11px); }
+  .acc-c-cell { min-height: 52px; padding: 3px 2px; min-width: 0; overflow: hidden; }
+  .acc-c-cell .acc-amount { font-size: clamp(8px, 2.5vw, 11px); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .acc-c-cell .acc-day { font-size: 10px; }
   .acc-c-cell.today .acc-day { width: 20px; height: 20px; font-size: 9px; }
   /* Mobile: week view */
@@ -521,6 +521,7 @@ body {
 .acc-c-cell {
   min-height: 64px; padding: 4px; border-bottom: 1px solid var(--c-n-100); border-right: 1px solid var(--c-n-100);
   cursor: pointer; transition: background .15s var(--easing); position: relative;
+  min-width: 0; overflow: hidden;
 }
 .acc-c-cell:nth-child(7n) { border-right: none; }
 .acc-c-cell:hover { background: var(--c-blue-50); }
@@ -528,7 +529,7 @@ body {
 .acc-c-cell.today { background: #EBF5FF; }
 .acc-c-cell .acc-day { font-size: 11px; font-weight: 500; color: var(--c-n-600); }
 .acc-c-cell.today .acc-day { width: 22px; height: 22px; background: var(--c-blue-600); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
-.acc-c-cell .acc-amount { font-size: clamp(9px, 2.8vw, 13px); font-weight: 700; margin-top: 2px; }
+.acc-c-cell .acc-amount { font-size: clamp(9px, 2.8vw, 13px); font-weight: 700; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .acc-c-cell .acc-amount.pos { color: var(--c-green); }
 .acc-c-cell .acc-amount.neg { color: var(--c-red); }
 .acc-c-cell .acc-amount.zero { color: var(--c-n-300); }
