@@ -1,6 +1,6 @@
 {
-  "name": "工作计划安排表",
-  "short_name": "工作计划",
+  "name": "计划记账 - 工作计划+记账本",
+  "short_name": "计划记账",
   "description": "简单易用的工作周计划安排工具",
   "start_url": "./index.html",
   "display": "standalone",

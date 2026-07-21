@@ -409,6 +409,88 @@ body {
   #app-header { padding-top: calc(0px + var(--safe-top)); }
   .install-banner { display: none !important; }
 }
+
+/* ===== Home Page ===== */
+.home-page { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 40px 20px; min-height: 100%; flex-wrap: wrap; align-content: center; }
+.home-card {
+  width: 260px; min-width: 200px; background: #fff; border-radius: var(--radius-lg); padding: 40px 24px;
+  text-align: center; cursor: pointer; border: 1.5px solid var(--c-n-200); transition: all .3s var(--easing);
+  box-shadow: var(--shadow-sm); flex-shrink: 0;
+}
+.home-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--c-blue-200); }
+.home-card:active { transform: scale(0.97); }
+.home-card .hc-icon { font-size: 48px; margin-bottom: 16px; }
+.home-card .hc-title { font-size: 20px; font-weight: 600; color: var(--c-n-900); margin-bottom: 8px; }
+.home-card .hc-desc { font-size: 13px; color: var(--c-n-400); line-height: 1.6; }
+.home-card.card-schedule { border-top: 4px solid var(--c-blue-600); }
+.home-card.card-accounting { border-top: 4px solid var(--c-green); }
+@media (max-width: 600px) {
+  .home-page { flex-direction: column; padding: 20px 16px; gap: 16px; }
+  .home-card { width: 100%; max-width: 320px; padding: 30px 20px; }
+}
+
+/* ===== Accounting ===== */
+.acc-page { padding: 8px 0; }
+.acc-stats {
+  display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; padding: 12px 4px; margin-bottom: 12px;
+}
+.acc-stat-item { text-align: center; background: #fff; border-radius: var(--radius-md); padding: 10px 4px; border: 1px solid var(--c-n-200); }
+.acc-stat-item .stat-label { font-size: 10px; color: var(--c-n-400); font-weight: 500; }
+.acc-stat-item .stat-value { font-size: 16px; font-weight: 700; margin-top: 2px; }
+.acc-stat-item .stat-value.positive { color: var(--c-green); }
+.acc-stat-item .stat-value.negative { color: var(--c-red); }
+.acc-stat-item .stat-value.neutral { color: var(--c-n-700); }
+
+.acc-calendar { background: #fff; border-radius: var(--radius-lg); border: 1px solid var(--c-n-200); overflow: hidden; }
+.acc-c-header { display: grid; grid-template-columns: repeat(7, 1fr); background: var(--c-n-50); border-bottom: 1px solid var(--c-n-200); }
+.acc-c-header .acc-ch-cell { padding: 8px 2px; text-align: center; font-size: 11px; font-weight: 600; color: var(--c-n-500); }
+.acc-c-grid { display: grid; grid-template-columns: repeat(7, 1fr); }
+.acc-c-cell {
+  min-height: 64px; padding: 4px; border-bottom: 1px solid var(--c-n-100); border-right: 1px solid var(--c-n-100);
+  cursor: pointer; transition: background .15s var(--easing); position: relative;
+}
+.acc-c-cell:nth-child(7n) { border-right: none; }
+.acc-c-cell:hover { background: var(--c-blue-50); }
+.acc-c-cell.other-month { background: var(--c-n-50); }
+.acc-c-cell.today { background: #EBF5FF; }
+.acc-c-cell .acc-day { font-size: 11px; font-weight: 500; color: var(--c-n-600); }
+.acc-c-cell.today .acc-day { width: 22px; height: 22px; background: var(--c-blue-600); color: #fff; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; }
+.acc-c-cell .acc-amount { font-size: 12px; font-weight: 700; margin-top: 2px; }
+.acc-c-cell .acc-amount.pos { color: var(--c-green); }
+.acc-c-cell .acc-amount.neg { color: var(--c-red); }
+.acc-c-cell .acc-amount.zero { color: var(--c-n-300); }
+.acc-c-cell .acc-dot { display: inline-block; width: 4px; height: 4px; border-radius: 50%; margin: 0 1px; }
+.acc-c-cell .acc-dot.income { background: var(--c-green); }
+.acc-c-cell .acc-dot.expense { background: var(--c-red); }
+
+/* Accounting day detail modal */
+.acc-day-title { font-size: 15px; font-weight: 600; color: var(--c-n-900); margin-bottom: 4px; }
+.acc-day-net { font-size: 13px; color: var(--c-n-500); margin-bottom: 16px; }
+.acc-entry { display: flex; align-items: center; justify-content: space-between; padding: 10px 0; border-bottom: 1px solid var(--c-n-100); }
+.acc-entry:last-child { border-bottom: none; }
+.acc-entry .ae-left { display: flex; align-items: center; gap: 8px; }
+.acc-entry .ae-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; }
+.acc-entry .ae-icon.income { background: #E9F7EF; }
+.acc-entry .ae-icon.expense { background: #FDEDEC; }
+.acc-entry .ae-info .ae-note { font-size: 13px; color: var(--c-n-800); font-weight: 500; }
+.acc-entry .ae-info .ae-time { font-size: 10px; color: var(--c-n-400); }
+.acc-entry .ae-amount { font-size: 15px; font-weight: 700; }
+.acc-entry .ae-amount.income { color: var(--c-green); }
+.acc-entry .ae-amount.expense { color: var(--c-red); }
+
+.acc-add-bar { display: flex; gap: 10px; margin-top: 16px; }
+.acc-add-bar .btn { flex: 1; justify-content: center; padding: 10px; font-size: 14px; border-radius: var(--radius-md); }
+.acc-add-bar .btn-income { background: #E9F7EF; border-color: var(--c-green); color: var(--c-green); }
+.acc-add-bar .btn-income:hover { background: var(--c-green); color: #fff; }
+.acc-add-bar .btn-expense { background: #FDEDEC; border-color: var(--c-red); color: var(--c-red); }
+.acc-add-bar .btn-expense:hover { background: var(--c-red); color: #fff; }
+
+/* Accounting entry form */
+.acc-form .form-row-amount { display: flex; gap: 12px; align-items: flex-end; }
+.acc-form .form-row-amount .form-group { flex: 1; }
+.acc-form .amount-prefix { font-size: 20px; font-weight: 700; padding-bottom: 9px; }
+.acc-form .amount-prefix.income { color: var(--c-green); }
+.acc-form .amount-prefix.expense { color: var(--c-red); }
 </style>
 </head>
 <body>
@@ -693,6 +775,47 @@ Store.applyTemplate = function(id, weekDates) {
 };
 Store._templates = Store.loadTemplates();
 Store._tasks = Store.loadTasks();
+
+// Accounting
+Store.ACCT_KEY = 'schedule_accounts';
+Store.MILESTONE_KEY = 'schedule_milestone';
+Store.loadAccounts = function() {
+  try { var d = localStorage.getItem(Store.ACCT_KEY); return d ? JSON.parse(d) : []; } catch(e) { return []; }
+};
+Store.saveAccounts = function(a) { try { localStorage.setItem(Store.ACCT_KEY, JSON.stringify(a)); } catch(e) {} };
+Store.getAllAccounts = function() { return Store._accounts; };
+Store.addAccountEntry = function(type, amount, note, date) {
+  var entry = { id: Utils.generateId(), type: type, amount: Math.abs(amount), note: note || '', date: date, createdAt: new Date().toISOString() };
+  Store._accounts.push(entry); Store.saveAccounts(Store._accounts); return entry;
+};
+Store.deleteAccountEntry = function(id) {
+  Store._accounts = Store._accounts.filter(function(e) { return e.id !== id; });
+  Store.saveAccounts(Store._accounts);
+};
+Store.getDayEntries = function(date) { return Store._accounts.filter(function(e) { return e.date === date; }); };
+Store.getDayNet = function(date) {
+  var es = Store.getDayEntries(date);
+  return es.reduce(function(s, e) { return s + (e.type === 'income' ? e.amount : -e.amount); }, 0);
+};
+Store.getMonthAccounts = function(y, m) {
+  var prefix = y + '-' + String(m).padStart(2, '0');
+  return Store._accounts.filter(function(e) { return e.date.slice(0, 7) === prefix; });
+};
+Store.getMonthStats = function(y, m) {
+  var es = Store.getMonthAccounts(y, m);
+  var income = es.filter(function(e) { return e.type === 'income'; }).reduce(function(s, e) { return s + e.amount; }, 0);
+  var expense = es.filter(function(e) { return e.type === 'expense'; }).reduce(function(s, e) { return s + e.amount; }, 0);
+  return { income: income, expense: expense, net: income - expense };
+};
+Store.getBalance = function() {
+  return Store._accounts.reduce(function(s, e) { return s + (e.type === 'income' ? e.amount : -e.amount); }, 0);
+};
+Store.getMilestone = function() { return Store._milestone; };
+Store.setMilestone = function(v) {
+  Store._milestone = v; try { localStorage.setItem(Store.MILESTONE_KEY, String(v)); } catch(e) {}
+};
+Store._accounts = Store.loadAccounts();
+Store._milestone = (function() { try { var v = localStorage.getItem(Store.MILESTONE_KEY); return v ? parseInt(v, 10) : 0; } catch(e) { return 0; } })();
 S.Store = Store;
 })(window.Schedule);
 
@@ -1175,19 +1298,192 @@ S.DataManager = DataManager;
 
 (function(S) {
 'use strict';
+var Utils = S.Utils, Store = S.Store, Toast = S.Toast, Confirm = S.Confirm;
+var Accounting = {};
+
+Accounting.currentDate = Utils.todayStr;
+
+Accounting.open = function() {
+  S.App.state.page = 'accounting';
+  S.App.refresh();
+};
+
+Accounting.render = function(container) {
+  var d = Utils.parseDate(Accounting.currentDate);
+  var y = d.getFullYear(), m = d.getMonth() + 1;
+  var page = Utils.el('div', { className: 'acc-page' });
+  Accounting.renderStats(page, y, m);
+  Accounting.renderMonthView(page, y, m);
+  container.appendChild(page);
+};
+
+Accounting.renderStats = function(parent, y, m) {
+  var stats = Store.getMonthStats(y, m);
+  var tb = Store.getBalance();
+  var grid = Utils.el('div', { className: 'acc-stats' });
+  [
+    { label: '本月收入', value: '+' + stats.income, cls: 'positive' },
+    { label: '本月支出', value: '-' + stats.expense, cls: 'negative' },
+    { label: '本月结余', value: (stats.net >= 0 ? '+' : '') + stats.net, cls: stats.net >= 0 ? 'positive' : 'negative' },
+    { label: '累计余额', value: (tb >= 0 ? '+' : '') + tb, cls: tb >= 0 ? 'positive' : 'negative' }
+  ].forEach(function(item) {
+    var div = Utils.el('div', { className: 'acc-stat-item' });
+    div.appendChild(Utils.el('div', { className: 'stat-label' }, item.label));
+    div.appendChild(Utils.el('div', { className: 'stat-value ' + item.cls }, item.value));
+    grid.appendChild(div);
+  });
+  parent.appendChild(grid);
+};
+
+Accounting.renderMonthView = function(parent, y, m) {
+  var grid = Utils.getMonthGrid(y, m);
+  var cal = Utils.el('div', { className: 'acc-calendar' });
+  var hdr = Utils.el('div', { className: 'acc-c-header' });
+  ['一','二','三','四','五','六','日'].forEach(function(d) { hdr.appendChild(Utils.el('div', { className: 'acc-ch-cell' }, d)); });
+  cal.appendChild(hdr);
+  var cg = Utils.el('div', { className: 'acc-c-grid' });
+  grid.forEach(function(cell) {
+    var ds = Utils.formatDate(cell.date);
+    var net = Store.getDayNet(ds);
+    var entries = Store.getDayEntries(ds);
+    var cls = 'acc-c-cell' + (!cell.isCurrentMonth ? ' other-month' : '') + (Utils.isToday(ds) ? ' today' : '');
+    var div = Utils.el('div', { className: cls, dataset: { date: ds } });
+    div.appendChild(Utils.el('div', { className: 'acc-day' }, String(cell.dayNum)));
+    if (cell.isCurrentMonth) {
+      var ac = net > 0 ? 'pos' : (net < 0 ? 'neg' : 'zero');
+      div.appendChild(Utils.el('div', { className: 'acc-amount ' + ac }, (net > 0 ? '+' : '') + (net || '0')));
+      if (entries.length > 0) {
+        var dw = Utils.el('div', { style: { marginTop: '1px' } });
+        entries.forEach(function(e) { dw.appendChild(Utils.el('span', { className: 'acc-dot ' + (e.type === 'income' ? 'income' : 'expense') })); });
+        div.appendChild(dw);
+      }
+      div.addEventListener('click', function() { Accounting._openDayDetail(ds); });
+    }
+    cg.appendChild(div);
+  });
+  cal.appendChild(cg);
+  parent.appendChild(cal);
+};
+
+Accounting._openDayDetail = function(date) {
+  var entries = Store.getDayEntries(date);
+  var net = Store.getDayNet(date);
+  var overlay = Utils.el('div', { className: 'modal-overlay', onclick: function(e) { if (e.target === overlay) overlay.remove(); } });
+  var modal = Utils.el('div', { className: 'modal' });
+  var hdr = Utils.el('div', { className: 'modal-header' });
+  hdr.appendChild(Utils.el('h2', {}, Utils.formatDateCN(date)));
+  hdr.appendChild(Utils.el('button', { className: 'modal-close', onclick: function() { overlay.remove(); } }, '×'));
+  modal.appendChild(hdr);
+  var body = Utils.el('div', { className: 'modal-body' });
+  body.appendChild(Utils.el('div', { className: 'acc-day-net' }, '当日净额：<strong>' + (net >= 0 ? '+' : '') + net + '</strong>'));
+  if (entries.length === 0) {
+    body.appendChild(Utils.el('div', { style: { textAlign: 'center', padding: '20px 0', color: '#A0AAB4', fontSize: '13px' } }, '暂无记录'));
+  } else {
+    entries.sort(function(a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
+    entries.forEach(function(e) {
+      var row = Utils.el('div', { className: 'acc-entry' });
+      var left = Utils.el('div', { className: 'ae-left' });
+      left.appendChild(Utils.el('div', { className: 'ae-icon ' + e.type }, e.type === 'income' ? '💰' : '💸'));
+      var info = Utils.el('div', { className: 'ae-info' });
+      info.appendChild(Utils.el('div', { className: 'ae-note' }, e.note || (e.type === 'income' ? '收入' : '支出')));
+      info.appendChild(Utils.el('div', { className: 'ae-time' }, e.createdAt ? e.createdAt.slice(11, 16) : ''));
+      left.appendChild(info); row.appendChild(left);
+      row.appendChild(Utils.el('div', { className: 'ae-amount ' + e.type }, (e.type === 'income' ? '+' : '-') + e.amount));
+      var db = Utils.el('button', { className: 'btn btn-icon btn-ghost', style: { color: '#E74C3C', fontSize: '14px', marginLeft: '4px' }, onclick: function(ev) { ev.stopPropagation(); Accounting._handleDeleteEntry(e.id, overlay); } }, '×');
+      row.appendChild(db); body.appendChild(row);
+    });
+  }
+  var ab = Utils.el('div', { className: 'acc-add-bar' });
+  ab.appendChild(Utils.el('button', { className: 'btn btn-income', onclick: function() { Accounting._showAddForm(date, 'income', overlay); } }, '+ 💰 存入'));
+  ab.appendChild(Utils.el('button', { className: 'btn btn-expense', onclick: function() { Accounting._showAddForm(date, 'expense', overlay); } }, '- 💸 支出'));
+  body.appendChild(ab); modal.appendChild(body); overlay.appendChild(modal);
+  document.getElementById('modal-root').appendChild(overlay);
+};
+
+Accounting._showAddForm = function(date, type, parentOverlay) {
+  parentOverlay.remove();
+  var overlay = Utils.el('div', { className: 'modal-overlay', onclick: function(e) { if (e.target === overlay) overlay.remove(); } });
+  var modal = Utils.el('div', { className: 'modal' });
+  var hdr = Utils.el('div', { className: 'modal-header' });
+  hdr.appendChild(Utils.el('h2', {}, type === 'income' ? '💰 存入' : '💸 支出'));
+  hdr.appendChild(Utils.el('button', { className: 'modal-close', onclick: function() { overlay.remove(); } }, '×'));
+  modal.appendChild(hdr);
+  var body = Utils.el('div', { className: 'modal-body acc-form' });
+  body.appendChild(Utils.el('div', { style: { fontSize: '13px', color: '#8A95A5', marginBottom: '12px' } }, Utils.formatDateCN(date)));
+  var ar = Utils.el('div', { className: 'form-row-amount' });
+  ar.appendChild(Utils.el('span', { className: 'amount-prefix ' + type }, type === 'income' ? '+' : '-'));
+  var ag = Utils.el('div', { className: 'form-group' });
+  ag.appendChild(Utils.el('label', { className: 'form-label' }, '金额'));
+  var amt = Utils.el('input', { className: 'form-input', type: 'number', step: '0.01', placeholder: '0.00' });
+  ag.appendChild(amt); ar.appendChild(ag); body.appendChild(ar);
+  var ng = Utils.el('div', { className: 'form-group', style: { marginTop: '12px' } });
+  ng.appendChild(Utils.el('label', { className: 'form-label' }, '备注'));
+  var note = Utils.el('input', { className: 'form-input', type: 'text', maxlength: '50', placeholder: '例如：午饭、工资...' });
+  ng.appendChild(note); body.appendChild(ng);
+  var qr = Utils.el('div', { style: { display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' } });
+  (type === 'income' ? [100,200,500,1000,3000] : [10,20,50,100,200]).forEach(function(qa) {
+    qr.appendChild(Utils.el('button', { className: 'btn btn-sm', style: { borderColor: type === 'income' ? '#27AE60' : '#E74C3C', color: type === 'income' ? '#27AE60' : '#E74C3C' }, onclick: function() { amt.value = qa; } }, qa));
+  });
+  body.appendChild(qr);
+  var ft = Utils.el('div', { className: 'modal-footer', style: { marginTop: '16px' } });
+  var rr = Utils.el('div', { className: 'mf-right' });
+  rr.appendChild(Utils.el('button', { className: 'btn', onclick: function() { overlay.remove(); Accounting._openDayDetail(date); } }, '取消'));
+  rr.appendChild(Utils.el('button', { className: 'btn btn-primary', onclick: function() {
+    var v = parseFloat(amt.value);
+    if (!v || v <= 0) { amt.className = 'form-input error'; return; }
+    Store.addAccountEntry(type, v, note.value.trim(), date);
+    Accounting._checkMilestone();
+    Toast.success(type === 'income' ? '💰 已存入 ' + v + ' 元' : '💸 已支出 ' + v + ' 元');
+    overlay.remove(); S.App && S.App.refresh();
+  } }, '确定'));
+  ft.appendChild(rr); modal.appendChild(ft); overlay.appendChild(modal);
+  document.getElementById('modal-root').appendChild(overlay);
+  setTimeout(function() { amt.focus(); }, 100);
+};
+
+Accounting._handleDeleteEntry = function(id, overlay) {
+  Confirm.show('删除记录', '确定删除？', function(ok) {
+    if (ok) { Store.deleteAccountEntry(id); overlay.remove(); S.App && S.App.refresh(); Toast.info('已删除'); }
+  });
+};
+
+Accounting._checkMilestone = function() {
+  var bal = Store.getBalance();
+  var last = Store.getMilestone();
+  var m = Math.floor(bal / 500) * 500;
+  if (m > last && m > 0) {
+    Store.setMilestone(m);
+    var msgs = [
+      '🎉 太棒了！余额突破 ' + m + ' 元！继续加油 💪',
+      '🎯 离目标又近了一步！已达 ' + m + ' 元 👏',
+      '🏆 存钱小能手！坚持就是胜利 ✨',
+      '💰 已达 ' + m + ' 元，好习惯改变生活 🎊',
+    ];
+    Toast.show(msgs[Math.floor(Math.random() * msgs.length)], 'success', 4000);
+  }
+};
+
+S.Accounting = Accounting;
+})(window.Schedule);
+
+(function(S) {
+'use strict';
 var Utils = S.Utils, Store = S.Store, Calendar = S.Calendar, Filter = S.Filter;
 var DragDrop = S.DragDrop, TaskModal = S.TaskModal, DataManager = S.DataManager;
 var App = {};
 
 App.state = {
   tasks: [], viewMode: 'week', currentDate: Utils.todayStr,
-  filterPriority: null, filterStatus: null
+  filterPriority: null, filterStatus: null,
+  page: 'home'
 };
 
 App.init = function() {
   try {
     var vm = localStorage.getItem(Store.VIEW_KEY); if (vm === 'week' || vm === 'month') App.state.viewMode = vm;
     var dt = localStorage.getItem(Store.DATE_KEY); if (dt) App.state.currentDate = dt;
+    var p = localStorage.getItem('schedule_page');
+    if (p === 'schedule' || p === 'accounting') { App.state.page = p; App.state.viewMode = 'week'; }
   } catch(e) {}
   App.state.tasks = Store.getAll();
   App._bindEvents();
@@ -1204,15 +1500,43 @@ App.setState = function(partial) {
 App.refresh = function() {
   App.state.tasks = Store.getAll();
   var content = document.getElementById('app-content');
-  document.getElementById('nav-title').textContent = Calendar.getLabel(App.state);
+  var header = document.querySelector('#app-header h1');
+  var nav = document.getElementById('app-nav');
+  var filter = document.getElementById('app-filter');
 
+  Utils.clear(content);
+
+  if (App.state.page === 'home') {
+    header.textContent = '计划记账';
+    nav.style.display = 'none';
+    filter.style.display = 'none';
+    App._removeHomeBtn();
+    App.renderHome(content);
+    try { localStorage.setItem('schedule_page', 'home'); } catch(e) {}
+    return;
+  }
+
+  // Non-home: ensure back button exists
+  App._ensureHomeBtn();
+
+  if (App.state.page === 'accounting') {
+    header.textContent = '💰 记账本';
+    nav.style.display = 'none';
+    filter.style.display = 'none';
+    Accounting.render(content);
+    try { localStorage.setItem('schedule_page', 'accounting'); } catch(e) {}
+    return;
+  }
+
+  // Schedule page
+  header.textContent = '📋 工作计划';
+  nav.style.display = '';
+  filter.style.display = '';
+  document.getElementById('nav-title').textContent = Calendar.getLabel(App.state);
   document.querySelectorAll('.view-tab').forEach(function(tab) {
     var mode = tab.dataset.action === 'view-week' ? 'week' : 'month';
     tab.classList.toggle('active', mode === App.state.viewMode);
   });
-
-  Utils.clear(content);
-
   if (App.state.tasks.length === 0) {
     var empty = Utils.el('div', { className: 'empty-state' },
       Utils.el('div', { className: 'empty-icon' }, '📋')
@@ -1221,11 +1545,40 @@ App.refresh = function() {
     empty.appendChild(Utils.el('div', { className: 'empty-desc' }, '点击时段格中的「+」创建任务，也可长按拖拽调整'));
     content.appendChild(empty);
   }
-
   if (App.state.viewMode === 'week') App._renderWeekView(content);
   else App._renderMonthView(content);
-
   App._renderFilterBar();
+  try { localStorage.setItem('schedule_page', 'schedule'); } catch(e) {}
+};
+
+App.renderHome = function(container) {
+  var hp = Utils.el('div', { className: 'home-page' });
+  // Schedule card
+  var sc = Utils.el('div', { className: 'home-card card-schedule', dataset: { action: 'go-schedule' } });
+  sc.appendChild(Utils.el('div', { className: 'hc-icon' }, '📋'));
+  sc.appendChild(Utils.el('div', { className: 'hc-title' }, '工作计划'));
+  sc.appendChild(Utils.el('div', { className: 'hc-desc' }, '按周安排工作任务<br>自由拖拽调整'));
+  hp.appendChild(sc);
+  // Accounting card
+  var ac = Utils.el('div', { className: 'home-card card-accounting', dataset: { action: 'go-accounting' } });
+  ac.appendChild(Utils.el('div', { className: 'hc-icon' }, '💰'));
+  ac.appendChild(Utils.el('div', { className: 'hc-title' }, '记账本'));
+  ac.appendChild(Utils.el('div', { className: 'hc-desc' }, '记录每日收支<br>看余额慢慢增长'));
+  hp.appendChild(ac);
+  container.appendChild(hp);
+};
+
+App._ensureHomeBtn = function() {
+  var hdr = document.querySelector('#app-header .header-left');
+  var existing = hdr.querySelector('.back-btn');
+  if (existing) return;
+  var back = Utils.el('button', { className: 'back-btn', style: { background: 'none', border: 'none', color: '#fff', fontSize: '20px', cursor: 'pointer', padding: '0 4px 0 0', lineHeight: '1' }, dataset: { action: 'go-home' } }, '◀');
+  hdr.insertBefore(back, hdr.firstChild);
+};
+
+App._removeHomeBtn = function() {
+  var btn = document.querySelector('#app-header .header-left .back-btn');
+  if (btn) btn.remove();
 };
 
 App._renderWeekView = function(container) {
@@ -1364,6 +1717,9 @@ App._bindEvents = function() {
   document.getElementById('app').addEventListener('click', function(e) {
     var target = e.target.closest('[data-action]'); if (!target) return;
     switch (target.dataset.action) {
+      case 'go-home': App.state.page = 'home'; App.refresh(); break;
+      case 'go-schedule': App.state.page = 'schedule'; App.refresh(); break;
+      case 'go-accounting': S.Accounting.open(); break;
       case 'prev': App.setState(Calendar.prev(App.state)); break;
       case 'next': App.setState(Calendar.next(App.state)); break;
       case 'today': App.setState(Calendar.today()); break;
