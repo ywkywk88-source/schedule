@@ -416,7 +416,7 @@ body {
   /* Mobile: stats 2x2 */
   .acc-stats { grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 8px 2px; }
   .acc-stat-item { padding: 8px 4px; }
-  .acc-stat-item .stat-value { font-size: 14px; }
+  .acc-stat-item .stat-value { font-size: clamp(10px, 3vw, 14px); overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* Mobile: calendar cells */
   .acc-c-cell { min-height: 52px; padding: 3px 2px; }
   .acc-c-cell .acc-amount { font-size: 10px; }
@@ -509,7 +509,7 @@ body {
 }
 .acc-stat-item { text-align: center; background: #fff; border-radius: var(--radius-md); padding: 10px 4px; border: 1px solid var(--c-n-200); }
 .acc-stat-item .stat-label { font-size: 10px; color: var(--c-n-400); font-weight: 500; }
-.acc-stat-item .stat-value { font-size: 16px; font-weight: 700; margin-top: 2px; }
+.acc-stat-item .stat-value { font-size: clamp(11px, 3.5vw, 18px); font-weight: 700; margin-top: 2px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .acc-stat-item .stat-value.positive { color: var(--c-green); }
 .acc-stat-item .stat-value.negative { color: var(--c-red); }
 .acc-stat-item .stat-value.neutral { color: var(--c-n-700); }

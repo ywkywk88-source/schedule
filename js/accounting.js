@@ -41,10 +41,10 @@ Accounting.renderStats = function(parent, y, m) {
   var tb = Store.getBalance();
   var grid = Utils.el('div', { className: 'acc-stats' });
   [
-    { label: '本月收入', value: '+' + stats.income, cls: 'positive' },
-    { label: '本月支出', value: '-' + stats.expense, cls: 'negative' },
-    { label: '本月结余', value: (stats.net >= 0 ? '+' : '') + stats.net, cls: stats.net >= 0 ? 'positive' : 'negative' },
-    { label: '金库余额', value: (tb >= 0 ? '+' : '') + tb, cls: tb >= 0 ? 'positive' : 'negative' }
+    { label: '本月收入', value: '+' + stats.income.toFixed(2), cls: 'positive' },
+    { label: '本月支出', value: '-' + stats.expense.toFixed(2), cls: 'negative' },
+    { label: '本月结余', value: (stats.net >= 0 ? '+' : '') + stats.net.toFixed(2), cls: stats.net >= 0 ? 'positive' : 'negative' },
+    { label: '金库余额', value: (tb >= 0 ? '+' : '') + tb.toFixed(2), cls: tb >= 0 ? 'positive' : 'negative' }
   ].forEach(function(item) {
     var div = Utils.el('div', { className: 'acc-stat-item' });
     div.appendChild(Utils.el('div', { className: 'stat-label' }, item.label));
@@ -81,7 +81,7 @@ Accounting.renderMonthView = function(parent, y, m) {
 
     if (cell.isCurrentMonth) {
       var ac = net > 0 ? 'pos' : (net < 0 ? 'neg' : 'zero');
-      div.appendChild(Utils.el('div', { className: 'acc-amount ' + ac }, (net > 0 ? '+' : '') + (net || '0')));
+      div.appendChild(Utils.el('div', { className: 'acc-amount ' + ac }, net ? (net > 0 ? '+' : '') + net.toFixed(2) : '0'));
       if (entries.length > 0) {
         var dw = Utils.el('div', { style: { marginTop: '1px' } });
         entries.forEach(function(e) { dw.appendChild(Utils.el('span', { className: 'acc-dot ' + (e.type === 'income' ? 'income' : 'expense') })); });
@@ -181,7 +181,7 @@ Accounting._openDayDetail = function(date) {
 
   // 当日净额
   var netEl = Utils.el('div', { className: 'acc-day-net' });
-  netEl.innerHTML = '当日净额：<strong>' + (net >= 0 ? '+' : '') + net + '</strong>';
+  netEl.innerHTML = '当日净额：<strong>' + (net >= 0 ? '+' : '') + net.toFixed(2) + '</strong>';
   body.appendChild(netEl);
 
   // ===== 内联记账表单 =====
@@ -274,7 +274,7 @@ Accounting._openDayDetail = function(date) {
       info.appendChild(Utils.el('div', { className: 'ae-note' }, e.note || (e.type === 'income' ? '收入' : '支出')));
       info.appendChild(Utils.el('div', { className: 'ae-time' }, e.createdAt ? e.createdAt.slice(11, 16) : ''));
       left.appendChild(info); row.appendChild(left);
-      row.appendChild(Utils.el('div', { className: 'ae-amount ' + e.type }, (e.type === 'income' ? '+' : '-') + e.amount));
+      row.appendChild(Utils.el('div', { className: 'ae-amount ' + e.type }, (e.type === 'income' ? '+' : '-') + e.amount.toFixed(2)));
       var db = Utils.el('button', { className: 'btn btn-icon btn-ghost', style: { color: '#E74C3C', fontSize: '14px', marginLeft: '4px' }, onclick: function(ev) { ev.stopPropagation(); Accounting._handleDeleteEntry(e.id, overlay); } }, '×');
       row.appendChild(db); body.appendChild(row);
     });
