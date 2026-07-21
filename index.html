@@ -1567,13 +1567,13 @@ App.renderHome = function(container) {
   var sc = Utils.el('div', { className: 'home-card card-schedule', dataset: { action: 'go-schedule' } });
   sc.appendChild(Utils.el('div', { className: 'hc-icon' }, '📋'));
   sc.appendChild(Utils.el('div', { className: 'hc-title' }, '祁老师暑假工作表'));
-  sc.appendChild(Utils.el('div', { className: 'hc-desc' }, '不怕同桌是学霸<br>就怕学霸过暑假 📚'));
+  var scD = Utils.el('div', { className: 'hc-desc' }); scD.innerHTML = '不怕同桌是学霸<br>就怕学霸过暑假 📚'; sc.appendChild(scD);
   hp.appendChild(sc);
   // Accounting card
   var ac = Utils.el('div', { className: 'home-card card-accounting', dataset: { action: 'go-accounting' } });
   ac.appendChild(Utils.el('div', { className: 'hc-icon' }, '💰'));
   ac.appendChild(Utils.el('div', { className: 'hc-title' }, '灿灿的小金库'));
-  ac.appendChild(Utils.el('div', { className: 'hc-desc' }, '存进去的是碎银<br>攒下来的是底气 ✨'));
+  var acD = Utils.el('div', { className: 'hc-desc' }); acD.innerHTML = '存进去的是碎银<br>攒下来的是底气 ✨'; ac.appendChild(acD);
   hp.appendChild(ac);
   container.appendChild(hp);
 };
