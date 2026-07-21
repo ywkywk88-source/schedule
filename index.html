@@ -658,6 +658,10 @@ Utils.toICSDate = function(d) {
   var y = d.getFullYear(), m = String(d.getMonth()+1).padStart(2,'0'), day = String(d.getDate()).padStart(2,'0');
   return y + m + day;
 };
+Utils.formatDateCN = function(dateStr) {
+  var d = Utils.parseDate(dateStr);
+  return d.getFullYear() + '年' + (d.getMonth() + 1) + '月' + d.getDate() + '日';
+};
 Utils.SLOT_LABELS = { morning: '上午', afternoon: '下午', evening: '晚上' };
 Utils.SLOT_HOURS = { morning: '08:00-12:00', afternoon: '13:00-18:00', evening: '19:00-22:00' };
 Utils.SLOT_DEFAULT = { morning: '09:00', afternoon: '14:00', evening: '20:00' };
@@ -1344,6 +1348,13 @@ Accounting.render = function(container) {
   var d = Utils.parseDate(Accounting.currentDate);
   var y = d.getFullYear(), m = d.getMonth() + 1;
   var page = Utils.el('div', { className: 'acc-page' });
+  // Month navigation
+  var navRow = Utils.el('div', { style: { display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '8px 4px' } });
+  navRow.appendChild(Utils.el('button', { className: 'btn btn-icon btn-ghost', dataset: { action: 'acc-prev' }, style: { fontSize: '16px' } }, '◀'));
+  var monthLabel = Utils.el('span', { style: { fontWeight: 600, fontSize: '16px', color: '#2C3E50' } }, y + '年' + m + '月');
+  navRow.appendChild(monthLabel);
+  navRow.appendChild(Utils.el('button', { className: 'btn btn-icon btn-ghost', dataset: { action: 'acc-next' }, style: { fontSize: '16px' } }, '▶'));
+  page.appendChild(navRow);
   Accounting.renderStats(page, y, m);
   Accounting.renderMonthView(page, y, m);
   container.appendChild(page);
@@ -1407,7 +1418,7 @@ Accounting._openDayDetail = function(date) {
   hdr.appendChild(Utils.el('button', { className: 'modal-close', onclick: function() { overlay.remove(); } }, '×'));
   modal.appendChild(hdr);
   var body = Utils.el('div', { className: 'modal-body' });
-  body.appendChild(Utils.el('div', { className: 'acc-day-net' }, '当日净额：<strong>' + (net >= 0 ? '+' : '') + net + '</strong>'));
+  var netEl = Utils.el('div', { className: 'acc-day-net' }); netEl.innerHTML = '当日净额：<strong>' + (net >= 0 ? '+' : '') + net + '</strong>'; body.appendChild(netEl);
   if (entries.length === 0) {
     body.appendChild(Utils.el('div', { style: { textAlign: 'center', padding: '20px 0', color: '#A0AAB4', fontSize: '13px' } }, '暂无记录'));
   } else {
@@ -1560,7 +1571,7 @@ App.refresh = function() {
   document.getElementById('app-header').classList.remove('home-center');
   document.querySelector('.header-right').style.display = '';
   var logo = document.querySelector('.header-left .logo');
-  if (logo) logo.style.display = '';
+  if (logo) logo.style.display = 'none';
   App._ensureHomeBtn();
 
   if (App.state.page === 'accounting') {
@@ -1581,14 +1592,6 @@ App.refresh = function() {
     var mode = tab.dataset.action === 'view-week' ? 'week' : 'month';
     tab.classList.toggle('active', mode === App.state.viewMode);
   });
-  if (App.state.tasks.length === 0) {
-    var empty = Utils.el('div', { className: 'empty-state' },
-      Utils.el('div', { className: 'empty-icon' }, '📋')
-    );
-    empty.appendChild(Utils.el('div', { className: 'empty-title' }, '还没有工作计划'));
-    empty.appendChild(Utils.el('div', { className: 'empty-desc' }, '点击时段格中的「+」创建任务，也可长按拖拽调整'));
-    content.appendChild(empty);
-  }
   if (App.state.viewMode === 'week') App._renderWeekView(content);
   else App._renderMonthView(content);
   App._renderFilterBar();
@@ -1764,6 +1767,16 @@ App._bindEvents = function() {
       case 'go-home': App.state.page = 'home'; App.refresh(); break;
       case 'go-schedule': App.state.page = 'schedule'; App.refresh(); break;
       case 'go-accounting': S.Accounting.open(); break;
+      case 'acc-prev': {
+        var ad = Utils.parseDate(S.Accounting.currentDate);
+        S.Accounting.currentDate = Utils.formatDate(new Date(ad.getFullYear(), ad.getMonth() - 1, 1));
+        App.refresh(); break;
+      }
+      case 'acc-next': {
+        var ad = Utils.parseDate(S.Accounting.currentDate);
+        S.Accounting.currentDate = Utils.formatDate(new Date(ad.getFullYear(), ad.getMonth() + 1, 1));
+        App.refresh(); break;
+      }
       case 'prev': App.setState(Calendar.prev(App.state)); break;
       case 'next': App.setState(Calendar.next(App.state)); break;
       case 'today': App.setState(Calendar.today()); break;
