@@ -161,8 +161,7 @@ Accounting._openDayDetail = function(date) {
     Store.addAccountEntry(selectedType, v, noteInput.value.trim(), date);
     Accounting._checkMilestone();
     Toast.success(selectedType === 'income' ? '💰 已存入 ' + v + ' 元' : '💸 已支出 ' + v + ' 元');
-    // 刷新弹窗
-    var oldOverlay = overlay;
+    // 刷新弹窗并关闭当前弹窗
     overlay.remove();
     Accounting._openDayDetail(date);
   } }, '✓ 确定');
