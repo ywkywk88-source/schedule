@@ -1511,11 +1511,12 @@ App.refresh = function() {
   Utils.clear(content);
 
   if (App.state.page === 'home') {
-    header.textContent = '祁琼的懒人工具百宝箱';
+    header.textContent = '祁琼的懒人工具百宝箱 🧰';
     nav.style.display = 'none';
     filter.style.display = 'none';
     document.getElementById('app-header').classList.add('home-center');
     document.querySelector('.header-right').style.display = 'none';
+    document.querySelector('.header-left .logo').style.display = 'none';
     App._removeHomeBtn();
     App.renderHome(content);
     try { localStorage.setItem('schedule_page', 'home'); } catch(e) {}
@@ -1525,6 +1526,8 @@ App.refresh = function() {
   // Non-home: reset header state
   document.getElementById('app-header').classList.remove('home-center');
   document.querySelector('.header-right').style.display = '';
+  var logo = document.querySelector('.header-left .logo');
+  if (logo) logo.style.display = '';
 
   if (App.state.page === 'accounting') {
     header.textContent = '💰 灿灿的小金库';
