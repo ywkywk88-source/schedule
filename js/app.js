@@ -61,6 +61,7 @@ App.refresh = function() {
   }
 
   // 非首页：还原 header
+  App._stopEggTimer();
   document.getElementById('app-header').classList.remove('home-center', 'acc-center');
   document.querySelector('.header-right').style.display = '';
   var logo = document.querySelector('.header-left .logo');
@@ -99,6 +100,66 @@ App.refresh = function() {
   try { localStorage.setItem('schedule_page', 'schedule'); } catch(e) {}
 };
 
+/* ===== 蛋蛋助手 ===== */
+App._eggTimer = null;
+App._eggIdx = 0;
+App._eggMessages = [
+  // 记账相关
+  '🧾 不要记假账，蛋蛋一直盯着你 👀',
+  '💰 每一笔都记清楚，不然蛋蛋会算术给你看 🧮',
+  '📝 账都记不明白，还想买手机？醒醒 📱',
+  '📊 今日未记账，蛋蛋怀疑你在偷偷变富 🤔',
+  // 偷懒相关
+  '🦥 静等灿灿今天又在哪里偷懒……找到了！👉这里',
+  '💤 工作五分钟，摸鱼两小时，蛋蛋都看着呢 😏',
+  '🏃 今日摸鱼指数过高，建议你稍微动一下 🪑',
+  '😌 累了就歇会儿，蛋蛋帮你放哨，老板来了叫你 👀',
+  // 吃饭生活
+  '🍚 到点了！蛋蛋命令你去吃饭 🗣️',
+  '🥟 再忙也得吃饭，饿瘦了蛋蛋会心疼的 🫶',
+  '🌙 熬夜记账不如早睡，蛋蛋也要充电的 🔋',
+  '💧 喝水时间到！你的蛋蛋发出了吨吨吨的警告 🚰',
+  // 正能量
+  '🌟 今天也是灿灿努力变好的一天，蛋蛋认证 ✨',
+  '💪 慢慢来，蛋蛋陪你一起攒钱买手机 📱',
+  '🎯 比昨天多存一块钱，就是胜利！',
+  '🌈 每天都有一点点进步，蛋蛋都记在小本本上了 📒',
+  '🫂 没事，蛋蛋在呢。钱没了可以再赚，开心最重要 ❤️',
+  // 调侃
+  '🤖 蛋蛋检测到你想偷懒——已驳回 ❌',
+  '🧠 蛋蛋的大脑只有 1KB，但比你的记账频率高 📈',
+  '🐣 别问了，蛋蛋只是一个刚出壳的小助手，什么都不知道 🤷',
+  '💬 今日温馨提示：关掉手机，立刻执行！……好了，可以继续玩了 😜',
+];
+
+App._renderEggAssistant = function(container) {
+  var wrap = Utils.el('div', { className: 'egg-assistant' });
+  wrap.appendChild(Utils.el('div', { className: 'egg-avatar' }, '🥚'));
+  var bubble = Utils.el('div', { className: 'egg-bubble' });
+  bubble.appendChild(Utils.el('div', { className: 'egg-tag' }, '🥚 蛋蛋说'));
+  var msg = Utils.el('div', { className: 'egg-message' });
+  msg.textContent = App._eggMessages[0];
+  bubble.appendChild(msg);
+  wrap.appendChild(bubble);
+  container.appendChild(wrap);
+  return msg;
+};
+
+App._startEggTimer = function(msgEl) {
+  App._stopEggTimer();
+  var bubble = msgEl.parentElement;
+  App._eggTimer = setInterval(function() {
+    App._eggIdx = (App._eggIdx + 1) % App._eggMessages.length;
+    msgEl.textContent = App._eggMessages[App._eggIdx];
+    bubble.className = 'egg-bubble bounce';
+    setTimeout(function() { bubble.className = 'egg-bubble'; }, 300);
+  }, 5000);
+};
+App._stopEggTimer = function() {
+  if (App._eggTimer) { clearInterval(App._eggTimer); App._eggTimer = null; }
+  App._eggIdx = 0;
+};
+
 /* ===== 首页渲染 ===== */
 App.renderHome = function(container) {
   var hp = Utils.el('div', { className: 'home-page' });
@@ -114,6 +175,10 @@ App.renderHome = function(container) {
   var acD = Utils.el('div', { className: 'hc-desc' }); acD.innerHTML = '存进去的是碎银<br>攒下来的是底气 ✨'; ac.appendChild(acD);
   hp.appendChild(ac);
   container.appendChild(hp);
+
+  // 蛋蛋助手
+  var eggMsg = App._renderEggAssistant(container);
+  App._startEggTimer(eggMsg);
 };
 
 /* ===== 返回按钮 ===== */

@@ -466,6 +466,34 @@ body {
   .home-card { width: 100%; max-width: 340px; padding: 36px 24px; }
 }
 
+/* ===== 蛋蛋助手 ===== */
+.egg-assistant {
+  display: flex; align-items: flex-start; gap: 12px; padding: 10px 4px 0;
+  max-width: 360px; margin: 0 auto; width: 100%;
+}
+.egg-avatar {
+  width: 44px; height: 44px; background: linear-gradient(135deg, #FFF8E1, #FFECB3);
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 24px; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  border: 2px solid #FFE082; position: relative;
+}
+.egg-bubble {
+  background: #fff; border-radius: 12px 12px 12px 4px; padding: 12px 16px;
+  position: relative; box-shadow: 0 2px 12px rgba(0,0,0,0.04);
+  border: 1px solid #F0E6D3; flex: 1; min-height: 48px;
+  animation: eggPop .3s ease;
+}
+.egg-bubble::before {
+  content: ''; position: absolute; left: -6px; top: 12px;
+  width: 10px; height: 10px; background: #fff;
+  border-left: 1px solid #F0E6D3; border-bottom: 1px solid #F0E6D3;
+  transform: rotate(45deg);
+}
+.egg-tag { font-size: 10px; color: #C49B3F; font-weight: 600; margin-bottom: 3px; letter-spacing: 0.5px; }
+.egg-message { font-size: 13px; color: #5D4A3A; line-height: 1.7; min-height: 18px; }
+@keyframes eggPop { 0% { transform: scale(0.92); opacity: 0.4; } 100% { transform: scale(1); opacity: 1; } }
+.egg-bubble.bounce { animation: eggPop .25s ease; }
+
 /* ===== Accounting ===== */
 .acc-page { padding: 8px 0; }
 .acc-stats {
