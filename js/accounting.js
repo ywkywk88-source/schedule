@@ -44,7 +44,7 @@ Accounting.renderStats = function(parent, y, m) {
     { label: '本月收入', value: '+' + stats.income, cls: 'positive' },
     { label: '本月支出', value: '-' + stats.expense, cls: 'negative' },
     { label: '本月结余', value: (stats.net >= 0 ? '+' : '') + stats.net, cls: stats.net >= 0 ? 'positive' : 'negative' },
-    { label: '累计余额', value: (tb >= 0 ? '+' : '') + tb, cls: tb >= 0 ? 'positive' : 'negative' }
+    { label: '金库余额', value: (tb >= 0 ? '+' : '') + tb, cls: tb >= 0 ? 'positive' : 'negative' }
   ].forEach(function(item) {
     var div = Utils.el('div', { className: 'acc-stat-item' });
     div.appendChild(Utils.el('div', { className: 'stat-label' }, item.label));
