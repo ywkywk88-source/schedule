@@ -394,15 +394,23 @@ DataManager.importJSON = function() {
 };
 
 DataManager.clearData = function() {
-  var total = Store._tasks.length;
-  if (total === 0) { S.Toast.info('暂无数据'); return; }
-  S.Confirm.show('清空数据', '确定清空全部 ' + total + ' 条任务？<br>此操作不可恢复。', function(ok) {
-    if (ok) { Store.clearAll(); S.App && S.App.refresh(); S.Toast.info('🗑️ 已清空'); }
+  var refDate = S.App && S.App.state ? Utils.parseDate(S.App.state.currentDate) : new Date();
+  var weekDates = Utils.getWeekDays(refDate).map(function(d) { return Utils.formatDate(d); });
+  var toDelete = Store._tasks.filter(function(t) { return weekDates.indexOf(t.date) !== -1; });
+  if (toDelete.length === 0) { S.Toast.info('本周暂无数据'); return; }
+  S.Confirm.show('清空本周', '确定删除本周 ' + toDelete.length + ' 条任务？<br>其他周的任务不受影响。', function(ok) {
+    if (ok) {
+      var deleted = Store.clearWeek(weekDates);
+      S.App && S.App.refresh();
+      S.Toast.info('🗑️ 已删除本周 ' + deleted + ' 条任务');
+    }
   });
 };
 
 DataManager.exportICS = function() {
-  var tasks = Store.getAll().filter(function(t) { return !t.completed; });
+  var refDate = S.App && S.App.state ? Utils.parseDate(S.App.state.currentDate) : new Date();
+  var weekDates = {}; Utils.getWeekDays(refDate).forEach(function(d) { weekDates[Utils.formatDate(d)] = true; });
+  var tasks = Store.getAll().filter(function(t) { return !t.completed && weekDates[t.date]; });
   if (tasks.length === 0) { S.Toast.info('没有待办任务可导出'); return; }
   var ics = 'BEGIN:VCALENDAR\r\nVERSION:2.0\r\nPRODID:-//Schedule//CN\r\nCALSCALE:GREGORIAN\r\nMETHOD:PUBLISH\r\nX-WR-CALNAME:懒人工具百宝箱\r\n';
   tasks.forEach(function(t) {

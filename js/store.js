@@ -69,6 +69,13 @@ Store.importJSON = function(jsonStr) {
   Store._tasks = data; Store.saveTasks(Store._tasks); return { ok: true };
 };
 Store.clearAll = function() { Store._tasks = []; Store.saveTasks(Store._tasks); };
+Store.clearWeek = function(dates) {
+  var before = Store._tasks.length;
+  var dateSet = {}; dates.forEach(function(d) { dateSet[d] = true; });
+  Store._tasks = Store._tasks.filter(function(t) { return !dateSet[t.date]; });
+  Store.saveTasks(Store._tasks);
+  return before - Store._tasks.length;
+};
 
 // Templates
 Store.TEMPLATES_KEY = 'schedule_templates';
