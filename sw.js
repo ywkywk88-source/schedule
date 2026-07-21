@@ -1,4 +1,4 @@
-const CACHE = 'schedule-v1';
+const CACHE = 'schedule-v2';
 const FILES = ['./index.html', './manifest.json', './icon.svg',
   './js/utils.js', './js/store.js', './js/ui.js',
   './js/schedule.js', './js/accounting.js', './js/app.js'];

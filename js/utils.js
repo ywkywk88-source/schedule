@@ -97,8 +97,9 @@ Utils.el = function(tag, attrs, children) {
     else if (k.slice(0, 2) === 'on') el.addEventListener(k.slice(2), attrs[k]);
     else el.setAttribute(k, attrs[k]);
   }
-  if (children) {
+  if (children != null) {
     if (typeof children === 'string') el.textContent = children;
+    else if (typeof children === 'number') el.textContent = String(children);
     else if (Array.isArray(children)) children.forEach(function(c) { if (c != null) el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
     else el.appendChild(typeof children === 'string' ? document.createTextNode(children) : children);
   }
