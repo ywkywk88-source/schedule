@@ -54,6 +54,8 @@ body {
 #app-header.home-center { justify-content: center; }
 #app-header.home-center .header-left { justify-content: center; gap: 8px; }
 #app-header.home-center h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+.header-left .back-btn { background: rgba(255,255,255,0.12) !important; border-radius: 50% !important; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px !important; padding: 0 !important; margin-right: 2px; transition: background .2s; }
+.header-left .back-btn:hover { background: rgba(255,255,255,0.25) !important; }
 .header-left { display: flex; align-items: center; gap: 10px; }
 .header-left .logo {
   width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm);
@@ -406,6 +408,26 @@ body {
   .modal-footer { padding: 0 16px 14px; }
   .form-row { flex-direction: column; gap: 0; }
   .form-input { font-size: 16px; } /* prevent iOS zoom */
+  /* Mobile: stats 2x2 */
+  .acc-stats { grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 8px 2px; }
+  .acc-stat-item { padding: 8px 4px; }
+  .acc-stat-item .stat-value { font-size: 14px; }
+  /* Mobile: calendar cells */
+  .acc-c-cell { min-height: 52px; padding: 3px 2px; }
+  .acc-c-cell .acc-amount { font-size: 10px; }
+  .acc-c-cell .acc-day { font-size: 10px; }
+  .acc-c-cell.today .acc-day { width: 20px; height: 20px; font-size: 9px; }
+  /* Mobile: week view */
+  .week-header, .week-row { grid-template-columns: 36px repeat(7, 1fr); }
+  .week-header .wh-cell { font-size: 10px; padding: 6px 2px; }
+  .week-header .wh-cell .wh-date { font-size: 9px; }
+  .slot-label { font-size: 9px; padding: 4px 2px; }
+  .slot-label .slot-sub { font-size: 7px; }
+  .slot-cell { min-height: 64px; padding: 2px; }
+  .task-card { padding: 4px 4px; font-size: 10px; }
+  /* Mobile: content padding */
+  #app-content { padding: 4px; }
+  .acc-page { padding: 4px 0; }
 }
 
 /* PWA standalone mode */
@@ -1539,6 +1561,7 @@ App.refresh = function() {
   document.querySelector('.header-right').style.display = '';
   var logo = document.querySelector('.header-left .logo');
   if (logo) logo.style.display = '';
+  App._ensureHomeBtn();
 
   if (App.state.page === 'accounting') {
     header.textContent = '💰 灿灿的小金库';
