@@ -548,6 +548,7 @@ body {
     <div class="header-right">
       <button class="btn btn-sm" data-action="template">📋 模板</button>
       <span style="width:1px;height:20px;background:rgba(255,255,255,0.15);margin:0 2px;"></span>
+      <button class="btn btn-sm" data-action="ical">🔔 日历</button>
       <button class="btn btn-sm btn-danger" data-action="clear">🗑️</button>
     </div>
   </header>
@@ -1807,6 +1808,7 @@ App._bindEvents = function() {
       case 'filter-priority': App.setState({ filterPriority: target.dataset.filter === 'all' ? null : target.dataset.filter }); break;
       case 'filter-status': App.setState({ filterStatus: target.dataset.filter === 'all' ? null : target.dataset.filter }); break;
       case 'template': S.TemplateManager.open(); break;
+      case 'ical': DataManager.exportICS(); break;
       case 'clear': DataManager.clearData(); break;
       case 'import': DataManager.importJSON(); break;
     }
