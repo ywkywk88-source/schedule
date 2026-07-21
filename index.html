@@ -54,6 +54,11 @@ body {
 #app-header.home-center { justify-content: center; }
 #app-header.home-center .header-left { justify-content: center; gap: 8px; }
 #app-header.home-center h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
+#app-header.acc-center { justify-content: center; }
+#app-header.acc-center .header-left { justify-content: center; }
+#app-header.acc-center { position: relative; }
+#app-header.acc-center .header-left { justify-content: center; }
+#app-header.acc-center .back-btn { position: absolute; left: 8px; top: 50%; transform: translateY(-50%); z-index: 1; }
 .header-left .back-btn { background: rgba(255,255,255,0.12) !important; border-radius: 50% !important; width: 30px; height: 30px; display: flex; align-items: center; justify-content: center; font-size: 16px !important; padding: 0 !important; margin-right: 2px; transition: background .2s; }
 .header-left .back-btn:hover { background: rgba(255,255,255,0.25) !important; }
 .header-left { display: flex; align-items: center; gap: 10px; }
@@ -1356,6 +1361,7 @@ Accounting.render = function(container) {
   navRow.appendChild(Utils.el('button', { className: 'btn btn-icon btn-ghost', dataset: { action: 'acc-next' }, style: { fontSize: '16px' } }, '▶'));
   page.appendChild(navRow);
   Accounting.renderStats(page, y, m);
+  Accounting.renderEmptyHint(page);
   Accounting.renderMonthView(page, y, m);
   container.appendChild(page);
 };
@@ -1376,6 +1382,13 @@ Accounting.renderStats = function(parent, y, m) {
     grid.appendChild(div);
   });
   parent.appendChild(grid);
+};
+
+Accounting.renderEmptyHint = function(parent) {
+  if (Store._accounts.length > 0) return;
+  var hint = Utils.el('div', { style: { textAlign: 'center', padding: '30px 20px 10px', color: '#A0AAB4', fontSize: '13px' } });
+  hint.innerHTML = '💸 还没有记账记录<br>点击日历中的日期开始记账吧 ✏️';
+  parent.appendChild(hint);
 };
 
 Accounting.renderMonthView = function(parent, y, m) {
@@ -1568,23 +1581,29 @@ App.refresh = function() {
   }
 
   // Non-home: reset header state
-  document.getElementById('app-header').classList.remove('home-center');
+  document.getElementById('app-header').classList.remove('home-center', 'acc-center');
   document.querySelector('.header-right').style.display = '';
   var logo = document.querySelector('.header-left .logo');
   if (logo) logo.style.display = 'none';
   App._ensureHomeBtn();
 
   if (App.state.page === 'accounting') {
-    header.textContent = '💰 灿灿的小金库';
+    header.textContent = '';
     nav.style.display = 'none';
     filter.style.display = 'none';
+    document.getElementById('app-header').classList.add('acc-center');
     Accounting.render(content);
+    // Typewriter effect
+    var accTitle = '灿灿的小金库', ai = 0;
+    (function accType() {
+      if (ai < accTitle.length) { header.textContent += accTitle[ai]; ai++; setTimeout(accType, 60 + Math.random() * 30); }
+    })();
     try { localStorage.setItem('schedule_page', 'accounting'); } catch(e) {}
     return;
   }
 
   // Schedule page
-  header.textContent = '📋 祁老师暑假工作表';
+  header.textContent = '📋 工作表';
   nav.style.display = '';
   filter.style.display = '';
   document.getElementById('nav-title').textContent = Calendar.getLabel(App.state);
