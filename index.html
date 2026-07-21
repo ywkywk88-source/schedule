@@ -45,6 +45,10 @@ body {
 /* ===== Header ===== */
 #app-header {
   display: flex; align-items: center; justify-content: space-between;
+  transition: justify-content .3s ease;
+}
+#app-header.home-center { justify-content: center; }
+#app-header.home-center .header-left { justify-content: center; gap: 8px; }
   padding: 0 16px; height: var(--header-h); padding-top: var(--safe-top);
   background: linear-gradient(135deg, #4A6FA5 0%, #3A5A8C 100%);
   color: #fff; flex-shrink: 0; position: sticky; top: 0; z-index: 10;
@@ -1507,17 +1511,20 @@ App.refresh = function() {
   Utils.clear(content);
 
   if (App.state.page === 'home') {
-    header.textContent = '懒人工具百宝箱';
+    header.textContent = '祁琼的懒人工具百宝箱';
     nav.style.display = 'none';
     filter.style.display = 'none';
+    document.getElementById('app-header').classList.add('home-center');
+    document.querySelector('.header-right').style.display = 'none';
     App._removeHomeBtn();
     App.renderHome(content);
     try { localStorage.setItem('schedule_page', 'home'); } catch(e) {}
     return;
   }
 
-  // Non-home: ensure back button exists
-  App._ensureHomeBtn();
+  // Non-home: reset header state
+  document.getElementById('app-header').classList.remove('home-center');
+  document.querySelector('.header-right').style.display = '';
 
   if (App.state.page === 'accounting') {
     header.textContent = '💰 灿灿的小金库';
