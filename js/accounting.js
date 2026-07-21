@@ -95,7 +95,7 @@ Accounting.renderMonthView = function(parent, y, m) {
   parent.appendChild(cal);
 };
 
-/* ===== 日详情弹窗 ===== */
+/* ===== 日详情弹窗（内联记账表单） ===== */
 Accounting._openDayDetail = function(date) {
   var entries = Store.getDayEntries(date);
   var net = Store.getDayNet(date);
@@ -107,12 +107,77 @@ Accounting._openDayDetail = function(date) {
   modal.appendChild(hdr);
 
   var body = Utils.el('div', { className: 'modal-body' });
+
+  // 当日净额
   var netEl = Utils.el('div', { className: 'acc-day-net' });
   netEl.innerHTML = '当日净额：<strong>' + (net >= 0 ? '+' : '') + net + '</strong>';
   body.appendChild(netEl);
 
+  // ===== 内联记账表单 =====
+  var formWrap = Utils.el('div', { className: 'acc-inline-form' });
+  // 类型切换
+  var typeToggle = Utils.el('div', { className: 'acc-type-toggle' });
+  var btnIncome = Utils.el('button', { className: 'btn-type active', dataset: { type: 'income' } }, '💰 存入');
+  var btnExpense = Utils.el('button', { className: 'btn-type', dataset: { type: 'expense' } }, '💸 支出');
+  typeToggle.appendChild(btnIncome);
+  typeToggle.appendChild(btnExpense);
+  formWrap.appendChild(typeToggle);
+
+  var selectedType = 'income';
+
+  // 金额行
+  var amtRow = Utils.el('div', { className: 'acc-form-row' });
+  var prefixSpan = Utils.el('span', { className: 'acc-amt-prefix income' }, '+');
+  var amtInput = Utils.el('input', { className: 'acc-amt-input', type: 'number', step: '0.01', placeholder: '输入金额...' });
+  amtRow.appendChild(prefixSpan);
+  amtRow.appendChild(amtInput);
+  formWrap.appendChild(amtRow);
+
+  // 备注
+  var noteInput = Utils.el('input', { className: 'acc-note-input', type: 'text', maxlength: '50', placeholder: '备注（选填）：午饭、工资...' });
+  formWrap.appendChild(noteInput);
+
+  // 快捷金额
+  var quickRow = Utils.el('div', { className: 'acc-quick-row' });
+  formWrap.appendChild(quickRow);
+
+  function updateQuickBtns(type) {
+    Utils.clear(quickRow);
+    var vals = type === 'income' ? [100, 200, 500, 1000, 3000] : [10, 20, 50, 100, 200];
+    vals.forEach(function(qa) {
+      quickRow.appendChild(Utils.el('button', { className: 'acc-quick-btn', onclick: function() { amtInput.value = qa; amtInput.focus(); } }, qa));
+    });
+  }
+  updateQuickBtns('income');
+
+  // 类型切换事件
+  btnIncome.onclick = function() { selectedType = 'income'; btnIncome.className = 'btn-type active'; btnExpense.className = 'btn-type'; prefixSpan.className = 'acc-amt-prefix income'; prefixSpan.textContent = '+'; amtInput.focus(); updateQuickBtns('income'); };
+  btnExpense.onclick = function() { selectedType = 'expense'; btnExpense.className = 'btn-type active'; btnIncome.className = 'btn-type'; prefixSpan.className = 'acc-amt-prefix expense'; prefixSpan.textContent = '-'; amtInput.focus(); updateQuickBtns('expense'); };
+
+  // 确认按钮
+  var submitBtn = Utils.el('button', { className: 'acc-submit-btn', onclick: function() {
+    var v = parseFloat(amtInput.value);
+    if (!v || v <= 0) { amtInput.className = 'acc-amt-input error'; return; }
+    Store.addAccountEntry(selectedType, v, noteInput.value.trim(), date);
+    Accounting._checkMilestone();
+    Toast.success(selectedType === 'income' ? '💰 已存入 ' + v + ' 元' : '💸 已支出 ' + v + ' 元');
+    // 刷新弹窗
+    var oldOverlay = overlay;
+    overlay.remove();
+    Accounting._openDayDetail(date);
+  } }, '✓ 确定');
+  formWrap.appendChild(submitBtn);
+  body.appendChild(formWrap);
+
+  // ===== 收支分隔线 =====
+  body.appendChild(Utils.el('div', { className: 'acc-divider' }));
+
+  // ===== 当日记录列表 =====
+  var listTitle = Utils.el('div', { className: 'acc-list-title' }, '明细');
+  body.appendChild(listTitle);
+
   if (entries.length === 0) {
-    body.appendChild(Utils.el('div', { style: { textAlign: 'center', padding: '20px 0', color: '#A0AAB4', fontSize: '13px' } }, '暂无记录'));
+    body.appendChild(Utils.el('div', { style: { textAlign: 'center', padding: '20px 0', color: '#A0AAB4', fontSize: '13px' } }, '还没有记录，在上面记账吧 ✏️'));
   } else {
     entries.sort(function(a, b) { return a.createdAt < b.createdAt ? 1 : -1; });
     entries.forEach(function(e) {
@@ -129,65 +194,10 @@ Accounting._openDayDetail = function(date) {
     });
   }
 
-  // 存入 / 支出 按钮
-  var ab = Utils.el('div', { className: 'acc-add-bar' });
-  ab.appendChild(Utils.el('button', { className: 'btn btn-income', onclick: function() { Accounting._showAddForm(date, 'income', overlay); } }, '+ 💰 存入'));
-  ab.appendChild(Utils.el('button', { className: 'btn btn-expense', onclick: function() { Accounting._showAddForm(date, 'expense', overlay); } }, '- 💸 支出'));
-  body.appendChild(ab);
-
   modal.appendChild(body); overlay.appendChild(modal);
   document.getElementById('modal-root').appendChild(overlay);
-};
-
-/* ===== 记账表单 ===== */
-Accounting._showAddForm = function(date, type, parentOverlay) {
-  parentOverlay.remove();
-  var overlay = Utils.el('div', { className: 'modal-overlay', onclick: function(e) { if (e.target === overlay) overlay.remove(); } });
-  var modal = Utils.el('div', { className: 'modal' });
-  var hdr = Utils.el('div', { className: 'modal-header' });
-  hdr.appendChild(Utils.el('h2', {}, type === 'income' ? '💰 存入' : '💸 支出'));
-  hdr.appendChild(Utils.el('button', { className: 'modal-close', onclick: function() { overlay.remove(); } }, '×'));
-  modal.appendChild(hdr);
-
-  var body = Utils.el('div', { className: 'modal-body acc-form' });
-  body.appendChild(Utils.el('div', { style: { fontSize: '13px', color: '#8A95A5', marginBottom: '12px' } }, Utils.formatDateCN(date)));
-
-  // 金额输入
-  var ar = Utils.el('div', { className: 'form-row-amount' });
-  ar.appendChild(Utils.el('span', { className: 'amount-prefix ' + type }, type === 'income' ? '+' : '-'));
-  var ag = Utils.el('div', { className: 'form-group' });
-  ag.appendChild(Utils.el('label', { className: 'form-label' }, '金额'));
-  var amt = Utils.el('input', { className: 'form-input', type: 'number', step: '0.01', placeholder: '0.00' });
-  ag.appendChild(amt); ar.appendChild(ag); body.appendChild(ar);
-
-  // 备注输入
-  var ng = Utils.el('div', { className: 'form-group', style: { marginTop: '12px' } });
-  ng.appendChild(Utils.el('label', { className: 'form-label' }, '备注'));
-  var note = Utils.el('input', { className: 'form-input', type: 'text', maxlength: '50', placeholder: '例如：午饭、工资...' });
-  ng.appendChild(note); body.appendChild(ng);
-
-  // 快捷金额按钮
-  var qr = Utils.el('div', { style: { display: 'flex', gap: '6px', flexWrap: 'wrap', marginTop: '4px' } });
-  (type === 'income' ? [100,200,500,1000,3000] : [10,20,50,100,200]).forEach(function(qa) {
-    qr.appendChild(Utils.el('button', { className: 'btn btn-sm', style: { borderColor: type === 'income' ? '#27AE60' : '#E74C3C', color: type === 'income' ? '#27AE60' : '#E74C3C' }, onclick: function() { amt.value = qa; } }, qa));
-  });
-  body.appendChild(qr);
-
-  // 确定 / 取消
-  var ft = Utils.el('div', { className: 'modal-footer', style: { marginTop: '16px' } });
-  var rr = Utils.el('div', { className: 'mf-right' });
-  rr.appendChild(Utils.el('button', { className: 'btn', onclick: function() { overlay.remove(); Accounting._openDayDetail(date); } }, '取消'));
-  rr.appendChild(Utils.el('button', { className: 'btn btn-primary', onclick: function() {
-    var v = parseFloat(amt.value);
-    if (!v || v <= 0) { amt.className = 'form-input error'; return; }
-    Store.addAccountEntry(type, v, note.value.trim(), date);
-    Accounting._checkMilestone();
-    Toast.success(type === 'income' ? '💰 已存入 ' + v + ' 元' : '💸 已支出 ' + v + ' 元');
-    overlay.remove(); S.App && S.App.refresh();
-  } }, '确定'));
-  ft.appendChild(rr); modal.appendChild(ft); overlay.appendChild(modal);
-  document.getElementById('modal-root').appendChild(overlay);
-  setTimeout(function() { amt.focus(); }, 100);
+  // 自动聚焦金额输入
+  setTimeout(function() { amtInput.focus(); }, 150);
 };
 
 /* ===== 删除记录 ===== */

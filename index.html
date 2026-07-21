@@ -515,19 +515,39 @@ body {
 .acc-entry .ae-amount.income { color: var(--c-green); }
 .acc-entry .ae-amount.expense { color: var(--c-red); }
 
-.acc-add-bar { display: flex; gap: 10px; margin-top: 16px; }
-.acc-add-bar .btn { flex: 1; justify-content: center; padding: 10px; font-size: 14px; border-radius: var(--radius-md); }
-.acc-add-bar .btn-income { background: #E9F7EF; border-color: var(--c-green); color: var(--c-green); }
-.acc-add-bar .btn-income:hover { background: var(--c-green); color: #fff; }
-.acc-add-bar .btn-expense { background: #FDEDEC; border-color: var(--c-red); color: var(--c-red); }
-.acc-add-bar .btn-expense:hover { background: var(--c-red); color: #fff; }
+/* ===== Accounting 内联记账表单 ===== */
+.acc-inline-form {
+  background: #F8FAFB; border-radius: var(--radius-md); padding: 14px; margin-bottom: 12px;
+  border: 1px solid var(--c-n-200);
+}
+.acc-type-toggle { display: flex; gap: 0; margin-bottom: 10px; border-radius: var(--radius-sm); overflow: hidden; border: 1px solid var(--c-n-200); }
+.acc-type-toggle .btn-type { flex: 1; padding: 8px; font-size: 14px; border: none; cursor: pointer; background: #fff; color: var(--c-n-500); transition: all .15s; }
+.acc-type-toggle .btn-type.active { font-weight: 600; }
+.acc-type-toggle .btn-type.active[data-type="income"] { background: var(--c-green); color: #fff; }
+.acc-type-toggle .btn-type.active[data-type="expense"] { background: var(--c-red); color: #fff; }
+.acc-form-row { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+.acc-amt-prefix { font-size: 22px; font-weight: 700; width: 28px; text-align: center; }
+.acc-amt-prefix.income { color: var(--c-green); }
+.acc-amt-prefix.expense { color: var(--c-red); }
+.acc-amt-input { flex: 1; font-size: 22px; font-weight: 700; padding: 8px 12px; border: 2px solid var(--c-n-200); border-radius: var(--radius-sm); outline: none; }
+.acc-amt-input:focus { border-color: var(--c-blue-600); }
+.acc-amt-input.error { border-color: var(--c-red); }
+.acc-note-input { width: 100%; font-size: 14px; padding: 8px 12px; border: 1px solid var(--c-n-200); border-radius: var(--radius-sm); outline: none; margin-bottom: 8px; box-sizing: border-box; }
+.acc-note-input:focus { border-color: var(--c-blue-400); }
+.acc-quick-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+.acc-quick-btn {
+  padding: 5px 14px; font-size: 13px; border: 1px solid var(--c-n-200); border-radius: var(--radius-sm);
+  background: #fff; color: var(--c-n-700); cursor: pointer;
+}
+.acc-quick-btn:hover { border-color: var(--c-blue-400); color: var(--c-blue-600); background: var(--c-blue-50); }
+.acc-submit-btn {
+  width: 100%; padding: 10px; font-size: 15px; font-weight: 600; border: none; border-radius: var(--radius-sm);
+  background: var(--c-blue-600); color: #fff; cursor: pointer; transition: background .15s;
+}
+.acc-submit-btn:hover { background: var(--c-blue-700); }
+.acc-divider { height: 1px; background: var(--c-n-200); margin: 8px 0 12px; }
+.acc-list-title { font-size: 12px; font-weight: 600; color: var(--c-n-400); margin-bottom: 4px; text-transform: uppercase; letter-spacing: 1px; }
 
-/* Accounting entry form */
-.acc-form .form-row-amount { display: flex; gap: 12px; align-items: flex-end; }
-.acc-form .form-row-amount .form-group { flex: 1; }
-.acc-form .amount-prefix { font-size: 20px; font-weight: 700; padding-bottom: 9px; }
-.acc-form .amount-prefix.income { color: var(--c-green); }
-.acc-form .amount-prefix.expense { color: var(--c-red); }
 </style>
 </head>
 <body>

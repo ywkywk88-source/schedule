@@ -72,10 +72,11 @@ App.refresh = function() {
     header.textContent = '';
     nav.style.display = 'none';
     filter.style.display = 'none';
+    document.querySelector('.header-right').style.display = 'none';
     document.getElementById('app-header').classList.add('acc-center');
     S.Accounting.render(content);
     // 打字动画
-    var accTitle = '灿灿的小金库', ai = 0;
+    var accTitle = '灿灿的小金库 💰', ai = 0;
     (function accType() {
       if (ai < accTitle.length) { header.textContent += accTitle[ai]; ai++; setTimeout(accType, 60 + Math.random() * 30); }
     })();
