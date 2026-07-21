@@ -95,6 +95,77 @@ Accounting.renderMonthView = function(parent, y, m) {
   parent.appendChild(cal);
 };
 
+/* ===== 鼓励/提醒文案 ===== */
+Accounting._encourageMsgs = [
+  '🎉 余额突破 {n} 元！钱包鼓了，腰板直了！',
+  '🏆 已达 {n} 元——当代葛朗台の自我修养 ✨',
+  '💰 {n} 元了！距离财务自由还差…亿点点 😎',
+  '🌟 恭喜小金库突破 {n} 元，建议奖励自己吃顿好的 🍜',
+  '📈 {n} 元打卡——存钱的速度决定了买手机的底气 📱',
+  '🎊 {n} 元达成！你就是这条街最会攒钱的仔 🐷',
+  '💪 金库已达 {n} 元，再攒攒就能换新手机了！（暗示）🤳',
+  '🌸 一日一钱，千日千钱。{n} 元成就已解锁～',
+];
+
+Accounting._saveMsgs = [
+  '🎉 存了 {n} 块！金钱不是你生命的全部，但手机是 📱',
+  '💰 {n} 元已入账——存钱的快乐，花钱的人不懂 😏',
+  '🌟 存入 {n} 元，距离买手机又近了一步（疯狂暗示）✨',
+  '💪 {n} 元到账！今天的你是闪闪发光的守财奴 ✨',
+  '🐷 小金库 +{n}，蓄力换机计划加载中… 📱',
+  '🌸 {n} 元已存好，自律的人运气不会太差 🍀',
+  '🎯 存入 {n} 元——存的是钱，攒的是底气 🏔️',
+  '🧮 +{n} 元，记账使人清醒，存款使人快乐 🥳',
+];
+
+Accounting._warnMsgs = [
+  '💸 今天花了 {n} 块！再买就剁手 ✂️✋',
+  '😱 支出 {n} 元——钱包以肉眼可见的速度瘪了 🥟',
+  '⚠️ 今日已花 {n} 元，建议立刻关掉购物软件 📵',
+  '📉 一天花了 {n} 块，这速度这个月要吃土了 🌾',
+  '💀 {n} 元没了…你的手机离你又远了一步 📱💔',
+  '🌊 花钱如流水，{n} 元就这么没了 🚰',
+  '🔥 {n} 元支出——再这样下去小金库要饿死了 🏚️',
+  '🥲 今日支出 {n} 元，建议默念三遍：我要存钱买手机 🤳',
+];
+
+/* ===== 弹出鼓励/提醒 ===== */
+Accounting._checkDaily = function(date, type, amount) {
+  var entries = Store.getDayEntries(date);
+  var totalIncome = 0, totalExpense = 0;
+  entries.forEach(function(e) {
+    if (e.type === 'income') totalIncome += e.amount;
+    else totalExpense += e.amount;
+  });
+  // 本轮刚存入/支出的也要算上
+  if (type === 'income') totalIncome += amount;
+  else totalExpense += amount;
+
+  // 单日存入 > 300 鼓励
+  if (type === 'income' && totalIncome > 300) {
+    var im = Accounting._saveMsgs[Math.floor(Math.random() * Accounting._saveMsgs.length)];
+    Toast.show(im.replace('{n}', String(amount)), 'success', 4000);
+    return;
+  }
+  // 单日支出 > 50 提醒
+  if (type === 'expense' && totalExpense > 50) {
+    var wm = Accounting._warnMsgs[Math.floor(Math.random() * Accounting._warnMsgs.length)];
+    Toast.show(wm.replace('{n}', String(amount)), 'warning', 4000);
+  }
+};
+
+/* ===== 里程碑鼓励 ===== */
+Accounting._checkMilestone = function() {
+  var bal = Store.getBalance();
+  var last = Store.getMilestone();
+  var m = Math.floor(bal / 500) * 500;
+  if (m > last && m > 0) {
+    Store.setMilestone(m);
+    var ms = Accounting._encourageMsgs[Math.floor(Math.random() * Accounting._encourageMsgs.length)];
+    Toast.show(ms.replace('{n}', String(m)), 'success', 5000);
+  }
+};
+
 /* ===== 日详情弹窗（内联记账表单） ===== */
 Accounting._openDayDetail = function(date) {
   var entries = Store.getDayEntries(date);
@@ -125,16 +196,16 @@ Accounting._openDayDetail = function(date) {
 
   var selectedType = 'income';
 
-  // 金额行
+  // 金额行（type=text + inputmode=decimal 兼容性好）
   var amtRow = Utils.el('div', { className: 'acc-form-row' });
   var prefixSpan = Utils.el('span', { className: 'acc-amt-prefix income' }, '+');
-  var amtInput = Utils.el('input', { className: 'acc-amt-input', type: 'number', step: '0.01', placeholder: '输入金额...' });
+  var amtInput = Utils.el('input', { className: 'acc-amt-input', type: 'text', inputmode: 'decimal', placeholder: '输入金额…' });
   amtRow.appendChild(prefixSpan);
   amtRow.appendChild(amtInput);
   formWrap.appendChild(amtRow);
 
   // 备注
-  var noteInput = Utils.el('input', { className: 'acc-note-input', type: 'text', maxlength: '50', placeholder: '备注（选填）：午饭、工资...' });
+  var noteInput = Utils.el('input', { className: 'acc-note-input', type: 'text', maxlength: '50', placeholder: '备注（选填）' });
   formWrap.appendChild(noteInput);
 
   // 快捷金额
@@ -150,28 +221,44 @@ Accounting._openDayDetail = function(date) {
   }
   updateQuickBtns('income');
 
-  // 类型切换事件
-  btnIncome.onclick = function() { selectedType = 'income'; btnIncome.className = 'btn-type active'; btnExpense.className = 'btn-type'; prefixSpan.className = 'acc-amt-prefix income'; prefixSpan.textContent = '+'; amtInput.focus(); updateQuickBtns('income'); };
-  btnExpense.onclick = function() { selectedType = 'expense'; btnExpense.className = 'btn-type active'; btnIncome.className = 'btn-type'; prefixSpan.className = 'acc-amt-prefix expense'; prefixSpan.textContent = '-'; amtInput.focus(); updateQuickBtns('expense'); };
+  // 类型切换
+  btnIncome.onclick = function() {
+    selectedType = 'income';
+    btnIncome.className = 'btn-type active'; btnExpense.className = 'btn-type';
+    prefixSpan.className = 'acc-amt-prefix income'; prefixSpan.textContent = '+';
+    amtInput.focus();
+    updateQuickBtns('income');
+  };
+  btnExpense.onclick = function() {
+    selectedType = 'expense';
+    btnExpense.className = 'btn-type active'; btnIncome.className = 'btn-type';
+    prefixSpan.className = 'acc-amt-prefix expense'; prefixSpan.textContent = '-';
+    amtInput.focus();
+    updateQuickBtns('expense');
+  };
 
   // 确认按钮
   var submitBtn = Utils.el('button', { className: 'acc-submit-btn', onclick: function() {
-    var v = parseFloat(amtInput.value);
-    if (!v || v <= 0) { amtInput.className = 'acc-amt-input error'; return; }
+    var raw = amtInput.value.replace(/[^0-9.]/g, '');
+    var v = parseFloat(raw);
+    if (!v || v <= 0) { amtInput.className = 'acc-amt-input error'; amtInput.focus(); return; }
     Store.addAccountEntry(selectedType, v, noteInput.value.trim(), date);
+    // 鼓励 / 提醒
+    Accounting._checkDaily(date, selectedType, v);
     Accounting._checkMilestone();
-    Toast.success(selectedType === 'income' ? '💰 已存入 ' + v + ' 元' : '💸 已支出 ' + v + ' 元');
-    // 刷新弹窗并关闭当前弹窗
+    // 刷新弹窗
     overlay.remove();
     Accounting._openDayDetail(date);
+    // 刷新外部统计
+    S.App && S.App.refresh();
   } }, '✓ 确定');
   formWrap.appendChild(submitBtn);
   body.appendChild(formWrap);
 
-  // ===== 收支分隔线 =====
+  // 分隔线
   body.appendChild(Utils.el('div', { className: 'acc-divider' }));
 
-  // ===== 当日记录列表 =====
+  // 当日记录列表
   var listTitle = Utils.el('div', { className: 'acc-list-title' }, '明细');
   body.appendChild(listTitle);
 
@@ -195,32 +282,19 @@ Accounting._openDayDetail = function(date) {
 
   modal.appendChild(body); overlay.appendChild(modal);
   document.getElementById('modal-root').appendChild(overlay);
-  // 自动聚焦金额输入
-  setTimeout(function() { amtInput.focus(); }, 150);
+  setTimeout(function() { amtInput.focus(); }, 200);
 };
 
 /* ===== 删除记录 ===== */
 Accounting._handleDeleteEntry = function(id, overlay) {
-  Confirm.show('删除记录', '确定删除？', function(ok) {
-    if (ok) { Store.deleteAccountEntry(id); overlay.remove(); S.App && S.App.refresh(); Toast.info('已删除'); }
+  Confirm.show('删除记录', '确定删除这条记录？', function(ok) {
+    if (ok) {
+      Store.deleteAccountEntry(id);
+      overlay.remove();
+      S.App && S.App.refresh();
+      Toast.info('已删除');
+    }
   });
-};
-
-/* ===== 里程碑鼓励 ===== */
-Accounting._checkMilestone = function() {
-  var bal = Store.getBalance();
-  var last = Store.getMilestone();
-  var m = Math.floor(bal / 500) * 500;
-  if (m > last && m > 0) {
-    Store.setMilestone(m);
-    var msgs = [
-      '🎉 太棒了！余额突破 ' + m + ' 元！继续加油 💪',
-      '🎯 离目标又近了一步！已达 ' + m + ' 元 👏',
-      '🏆 存钱小能手！坚持就是胜利 ✨',
-      '💰 已达 ' + m + ' 元，好习惯改变生活 🎊',
-    ];
-    Toast.show(msgs[Math.floor(Math.random() * msgs.length)], 'success', 4000);
-  }
 };
 
 S.Accounting = Accounting;
