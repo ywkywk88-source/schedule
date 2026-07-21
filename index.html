@@ -45,15 +45,15 @@ body {
 /* ===== Header ===== */
 #app-header {
   display: flex; align-items: center; justify-content: space-between;
-  transition: justify-content .3s ease;
-}
-#app-header.home-center { justify-content: center; }
-#app-header.home-center .header-left { justify-content: center; gap: 8px; }
   padding: 0 16px; height: var(--header-h); padding-top: var(--safe-top);
   background: linear-gradient(135deg, #4A6FA5 0%, #3A5A8C 100%);
   color: #fff; flex-shrink: 0; position: sticky; top: 0; z-index: 10;
   -webkit-backdrop-filter: blur(10px); backdrop-filter: blur(10px);
+  transition: justify-content .3s ease;
 }
+#app-header.home-center { justify-content: center; }
+#app-header.home-center .header-left { justify-content: center; gap: 8px; }
+#app-header.home-center h1 { font-size: 24px; font-weight: 700; letter-spacing: 1px; }
 .header-left { display: flex; align-items: center; gap: 10px; }
 .header-left .logo {
   width: 30px; height: 30px; background: rgba(255,255,255,0.2); border-radius: var(--radius-sm);
@@ -415,22 +415,28 @@ body {
 }
 
 /* ===== Home Page ===== */
-.home-page { display: flex; align-items: center; justify-content: center; gap: 24px; padding: 40px 20px; min-height: 100%; flex-wrap: wrap; align-content: center; }
+.home-page { display: flex; align-items: center; justify-content: center; gap: 32px; padding: 60px 20px; min-height: calc(100vh - var(--header-h) - var(--safe-top)); flex-wrap: wrap; align-content: center; }
 .home-card {
-  width: 260px; min-width: 200px; background: #fff; border-radius: var(--radius-lg); padding: 40px 24px;
+  width: 270px; min-width: 210px; background: #fff; border-radius: var(--radius-lg); padding: 44px 28px;
   text-align: center; cursor: pointer; border: 1.5px solid var(--c-n-200); transition: all .3s var(--easing);
   box-shadow: var(--shadow-sm); flex-shrink: 0;
+  animation: cardIn .6s var(--easing) both;
 }
-.home-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-md); border-color: var(--c-blue-200); }
+.home-card:nth-child(2) { animation-delay: .15s; }
+@keyframes cardIn {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.home-card:hover { transform: translateY(-6px); box-shadow: var(--shadow-md); border-color: var(--c-blue-200); }
 .home-card:active { transform: scale(0.97); }
-.home-card .hc-icon { font-size: 48px; margin-bottom: 16px; }
-.home-card .hc-title { font-size: 20px; font-weight: 600; color: var(--c-n-900); margin-bottom: 8px; }
-.home-card .hc-desc { font-size: 13px; color: var(--c-n-400); line-height: 1.6; }
+.home-card .hc-icon { font-size: 52px; margin-bottom: 18px; }
+.home-card .hc-title { font-size: 22px; font-weight: 700; color: var(--c-n-900); margin-bottom: 10px; }
+.home-card .hc-desc { font-size: 14px; color: var(--c-n-400); line-height: 1.7; }
 .home-card.card-schedule { border-top: 4px solid var(--c-blue-600); }
 .home-card.card-accounting { border-top: 4px solid var(--c-green); }
 @media (max-width: 600px) {
-  .home-page { flex-direction: column; padding: 20px 16px; gap: 16px; }
-  .home-card { width: 100%; max-width: 320px; padding: 30px 20px; }
+  .home-page { flex-direction: column; padding: 40px 20px; gap: 20px; min-height: calc(100dvh - var(--header-h) - var(--safe-top)); }
+  .home-card { width: 100%; max-width: 340px; padding: 36px 24px; }
 }
 
 /* ===== Accounting ===== */
@@ -1511,7 +1517,7 @@ App.refresh = function() {
   Utils.clear(content);
 
   if (App.state.page === 'home') {
-    header.textContent = '祁琼的懒人工具百宝箱 🧰';
+    header.textContent = '';
     nav.style.display = 'none';
     filter.style.display = 'none';
     document.getElementById('app-header').classList.add('home-center');
@@ -1519,6 +1525,11 @@ App.refresh = function() {
     document.querySelector('.header-left .logo').style.display = 'none';
     App._removeHomeBtn();
     App.renderHome(content);
+    // Typewriter effect
+    var title = '祁琼的懒人工具百宝箱 🧰', ti = 0;
+    (function typeNext() {
+      if (ti < title.length) { header.textContent += title[ti]; ti++; setTimeout(typeNext, 70 + Math.random() * 40); }
+    })();
     try { localStorage.setItem('schedule_page', 'home'); } catch(e) {}
     return;
   }
