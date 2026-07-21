@@ -1,5 +1,7 @@
 const CACHE = 'schedule-v1';
-const FILES = ['./index.html', './manifest.json', './icon.svg'];
+const FILES = ['./index.html', './manifest.json', './icon.svg',
+  './js/utils.js', './js/store.js', './js/ui.js',
+  './js/schedule.js', './js/accounting.js', './js/app.js'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
